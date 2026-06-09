@@ -1,0 +1,478 @@
+﻿@{
+    ViewBag.Title = "Task Creation";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    .task-page-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #1e293b;
+    }
+
+    .tm-task-container {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+    }
+
+    .tm-task-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 25px;
+    }
+
+    .tm-task-box {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .tm-task-box label {
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #334155;
+            font-size: 16px;
+        }
+
+            .tm-task-box label i {
+                margin-right: 8px;
+                color: #2563eb;
+            }
+
+    .tm-task-input, .tm-task-select, .tm-task-textarea {
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 15px;
+        width: 100%;
+    }
+
+    .tm-task-textarea {
+        resize: none;
+    }
+
+        .tm-task-input:focus, .tm-task-select:focus, .tm-task-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 5px rgba(37,99,235,0.3);
+        }
+
+    .tm-task-full {
+        grid-column: 1/3;
+    }
+
+    .tm-task-btn-area {
+        margin-top: 25px;
+        display: flex;
+        justify-content: flex-start;
+        gap: 15px;
+    }
+
+    .tm-task-btn {
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.3s;
+    }
+
+        .tm-task-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .tm-task-save {
+        position: relative;
+        padding: 0.75em 1.5em;
+        border-radius: 0.625em;
+        border: 2px solid #4f46e5;
+        font-size: 0.938em;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.125em;
+        background: transparent;
+        color: #4f46e5;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 0 0 0 transparent;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .tm-task-save:hover {
+            background: rgba(100, 150, 229, 0.1);
+            box-shadow: 0 0 25px 5px rgba(79, 70, 229, 0.3);
+            color: purple;
+        }
+
+        .tm-task-save::before {
+            content: "";
+            display: block;
+            width: 0px;
+            height: 86%;
+            position: absolute;
+            top: 7%;
+            left: 0%;
+            opacity: 0;
+            background: linear-gradient(90deg, transparent, #4f46e5, transparent);
+            box-shadow: 0 0 50px 30px #00ffff;
+            transform: skewX(-20deg);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .tm-task-save:hover::before {
+            animation: neon-shine 0.6s 0s infinite;
+        }
+
+    @@keyframes neon-shine {
+        from {
+            opacity: 0;
+            left: 0%;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+            left: 100%;
+        }
+    }
+
+
+    .modal-dialog {
+        max-width: 900px;
+       
+    }
+
+    .modal-content {
+        border-radius: 18px;
+        border: none;
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 20px 30px;
+    }
+
+    .modal-title {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .subtask-modal-dialog {
+        max-width: 500px !important;
+    }
+
+    .subtask-input-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .subtask-input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+    }
+
+        .subtask-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 5px rgba(37,99,235,0.3);
+        }
+
+    .subtask-add-btn {
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .subtask-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .subtask-item-title {
+        font-size: 14px;
+        color: #334155;
+    }
+
+    .subtask-delete-btn {
+        background: #dc2626;
+        color: white;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    
+
+
+    .subtask-empty {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 14px;
+        padding: 20px;
+    }
+
+    .view-subtask-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        min-width: 220px;
+        z-index: 9999;
+        padding: 8px;
+        display: none;
+    }
+
+        .view-subtask-dropdown.show {
+            display: block;
+        }
+
+    .view-subtask-item {
+        padding: 8px 10px;
+        font-size: 13px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+        .view-subtask-item:last-child {
+            border-bottom: none;
+        }
+
+    .view-subtask-empty {
+        padding: 10px;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    @@media(max-width:900px) {
+        .tm-task-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .tm-task-full {
+            grid-column: 1/2;
+        }
+    }
+</style>
+
+<div class="task-page-header">
+    <div class="task-page-title">
+        <h2>
+        <i class="fa-solid fa-list-check"></i>
+        Task Management
+            </h2>
+    </div>
+    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal" style="border-radius:10px;padding:10px 20px;font-weight:600;">
+        <i class="fa-solid fa-plus" style="margin-right:6px;"></i> Add Task
+    </button>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Task Creations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="tm-task-container">
+                    <div class="tm-task-grid">
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-heading"></i> Task Title</label>
+                            <input type="text" id="inputTaskTitle" class="tm-task-input" placeholder="Enter task title" />
+                            <span id="validateTaskTitle" style="color:red;font-size:14px;"></span>
+                        </div>
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-flag"></i> Priority</label>
+                            <select id="inputPriority" class="tm-task-select">
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+                        <div class="tm-task-box tm-task-full">
+                            <label style="display:flex;justify-content:space-between;align-items:center;">
+                                <span><i class="fa-solid fa-align-left"></i> Description</span>
+                                <button type="button" onclick="WriteWithAI()" style="
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.3s;">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Write with AI
+                                </button>
+                            </label>
+                            <textarea rows="5" id="inputDescription" class="tm-task-textarea" placeholder="Enter description or click Write with AI..."></textarea>
+                            <div id="aiGenerating" style="display:none;font-size:13px;color:#7c3aed;margin-top:5px;">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Generating description...
+                            </div>
+                        </div>
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-calendar-days"></i> Start Date</label>
+                            <input type="date" id="inputStartDate" class="tm-task-input" />
+                            <span id="validateStartDate" style="color:red;font-size:14px;"></span>
+                        </div>
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-calendar-check"></i> Due Date</label>
+                            <input type="date" id="inputDueDate" class="tm-task-input" />
+                            <span id="validateDueDate" style="color:red;font-size:14px;"></span>
+                        </div>
+                    </div>
+                    <div class="tm-task-btn-area">
+                        <button type="button" class="tm-task-btn tm-task-save" onclick="SaveTask()">
+                            <i class="fa-solid fa-floppy-disk"></i> Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subtask Modal -->
+<div class="modal fade" id="subtaskModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog subtask-modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa-solid fa-list-check" style="color:#2563eb;margin-right:8px;"></i> Subtasks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="subtaskTaskId" />
+                <div class="subtask-input-row">
+                    <input type="text" id="inputSubTask" class="subtask-input" placeholder="Enter subtask title" />
+                    <button class="subtask-add-btn" onclick="AddSubTask()">
+                        <i class="fa-solid fa-plus"></i> Add
+                    </button>
+                </div>
+                <div id="subtaskList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="tm-task-container">
+                    <input type="hidden" id="editTaskId" />
+                    <div class="tm-task-grid">
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-heading"></i> Task Title</label>
+                            <input type="text" id="editTaskTitle" class="tm-task-input" />
+                        </div>
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-flag"></i> Priority</label>
+                            <select id="editPriority" class="tm-task-select">
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+                        <div class="tm-task-box tm-task-full">
+                            <label><i class="fa-solid fa-align-left"></i> Description</label>
+                            <textarea rows="5" id="editDescription" class="tm-task-textarea"></textarea>
+                        </div>
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-calendar-days"></i> Start Date</label>
+                            <input type="date" id="editStartDate" class="tm-task-input" />
+                        </div>
+                        <div class="tm-task-box">
+                            <label><i class="fa-solid fa-calendar-check"></i> Due Date</label>
+                            <input type="date" id="editDueDate" class="tm-task-input" />
+                        </div>
+                    </div>
+                    <div class="tm-task-btn-area">
+                        <button type="button" class="tm-task-btn tm-task-save" onclick="UpdateTask()">
+                            <i class="fa-solid fa-floppy-disk"></i> Update
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fa-solid fa-triangle-exclamation fa-2x text-danger mb-3"></i>
+                <p>Are you sure you want to delete this task?</p>
+                <input type="hidden" id="deleteTaskId" />
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-danger" onclick="ConfirmDelete()">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<table id="taskTable" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th class="text-center">Sno</th>
+            <th class="text-center">Task Title</th>
+            <th class="text-center">Priority</th>
+            <th class="text-center">Description</th>
+            <th class="text-center">Start Date</th>
+            <th class="text-center">Due Date</th>
+            <th class="text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody id="taskTableBody">
+    </tbody>
+</table>
+
+<script src="/javascript/taskcreation.js?v=4"></script>

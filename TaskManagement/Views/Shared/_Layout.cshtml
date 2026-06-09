@@ -1,0 +1,1141 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+
+
+        @@keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(37,99,235,0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(37,99,235,0);
+            }
+        }
+
+        @@keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @@keyframes shimmer {
+            0% {
+                background-position: -400px 0;
+            }
+
+            100% {
+                background-position: 400px 0;
+            }
+        }
+
+        @@keyframes activePing {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+        }
+
+        .tm-layout-sidebar {
+            width: 270px;
+            height: 100vh;
+            background: linear-gradient(180deg, #0a0f1e 0%, #0f172a 40%, #111827 100%);
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow: hidden;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+            /* Decorative glow blobs */
+            .tm-layout-sidebar::before {
+                content: '';
+                position: absolute;
+                width: 220px;
+                height: 220px;
+                background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%);
+                top: -60px;
+                left: -60px;
+                border-radius: 50%;
+                pointer-events: none;
+            }
+
+            .tm-layout-sidebar::after {
+                content: '';
+                position: absolute;
+                width: 180px;
+                height: 180px;
+                background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+                bottom: 80px;
+                right: -60px;
+                border-radius: 50%;
+                pointer-events: none;
+            }
+
+        /* LOGO */
+        .tm-layout-logo {
+            padding: 26px 24px 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            position: relative;
+            z-index: 1;
+        }
+
+        .tm-layout-logo-inner {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .tm-layout-logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 4px 14px rgba(37,99,235,0.45);
+            flex-shrink: 0;
+        }
+
+        .tm-layout-logo-text {
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.2px;
+        }
+
+        .tm-layout-logo-sub {
+            color: rgba(255,255,255,0.4);
+            font-size: 11px;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* USER PILL */
+        .tm-sidebar-user {
+            margin: 18px 16px 0;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 13px 15px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tm-sidebar-user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .tm-sidebar-user-name {
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .tm-sidebar-user-role {
+            color: rgba(255,255,255,0.45);
+            font-size: 11px;
+            margin-top: 1px;
+        }
+
+        .tm-sidebar-online {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            margin-left: auto;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+            .tm-sidebar-online::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                border-radius: 50%;
+                background: #22c55e;
+                animation: activePing 1.5s ease-out infinite;
+            }
+
+        /* MENU LABEL */
+        .tm-menu-label {
+            color: rgba(255,255,255,0.25);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 18px 24px 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* MENU SCROLL AREA */
+        .tm-layout-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px 12px 12px;
+            position: relative;
+            z-index: 1;
+            scrollbar-width: none;
+        }
+
+            .tm-layout-menu::-webkit-scrollbar {
+                display: none;
+            }
+
+            .tm-layout-menu a {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                color: rgba(255,255,255,0.6);
+                text-decoration: none;
+                padding: 11px 14px;
+                border-radius: 12px;
+                transition: all 0.22s ease;
+                font-size: 14px;
+                font-weight: 500;
+                margin-bottom: 2px;
+                position: relative;
+                overflow: hidden;
+            }
+
+                .tm-layout-menu a .menu-icon {
+                    width: 34px;
+                    height: 34px;
+                    border-radius: 9px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    background: rgba(255,255,255,0.06);
+                    transition: all 0.22s ease;
+                    flex-shrink: 0;
+                }
+
+                .tm-layout-menu a:hover {
+                    background: rgba(37,99,235,0.15);
+                    color: white;
+                    transform: translateX(4px);
+                }
+
+                    .tm-layout-menu a:hover .menu-icon {
+                        background: rgba(37,99,235,0.3);
+                        color: #60a5fa;
+                    }
+
+                .tm-layout-menu a.active {
+                    background: linear-gradient(135deg, rgba(37,99,235,0.3), rgba(37,99,235,0.15));
+                    color: white;
+                    border: 1px solid rgba(37,99,235,0.25);
+                }
+
+                    .tm-layout-menu a.active .menu-icon {
+                        background: #2563eb;
+                        color: white;
+                        box-shadow: 0 4px 12px rgba(37,99,235,0.4);
+                    }
+
+                    .tm-layout-menu a.active::before {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 20%;
+                        bottom: 20%;
+                        width: 3px;
+                        background: #2563eb;
+                        border-radius: 0 3px 3px 0;
+                    }
+                /* logout link red tint */
+                .tm-layout-menu a.logout-link:hover {
+                    background: rgba(239,68,68,0.15);
+                }
+
+                    .tm-layout-menu a.logout-link:hover .menu-icon {
+                        background: rgba(239,68,68,0.25);
+                        color: #f87171;
+                    }
+
+        /* SIDEBAR BOTTOM VERSION */
+        .tm-sidebar-bottom {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            z-index: 1;
+        }
+
+        .tm-sidebar-version {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 9px 12px;
+        }
+
+            .tm-sidebar-version i {
+                color: rgba(255,255,255,0.3);
+                font-size: 13px;
+            }
+
+            .tm-sidebar-version span {
+                color: rgba(255,255,255,0.3);
+                font-size: 11px;
+            }
+
+        /* ── TOPBAR ──────────────────────────────────── */
+        .tm-layout-topbar {
+            height: 70px;
+            background: white;
+            margin-left: 270px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            box-shadow: 0 1px 0 #e2e8f0, 0 4px 20px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 0;
+            z-index: 9;
+        }
+
+        .tm-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .tm-topbar-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tm-topbar-breadcrumb-home {
+            width: 32px;
+            height: 32px;
+            background: #eff6ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 13px;
+        }
+
+        .tm-topbar-breadcrumb-sep {
+            color: #cbd5e1;
+            font-size: 13px;
+        }
+
+        .tm-layout-topbar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.3px;
+        }
+
+        .tm-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tm-topbar-icon-btn {
+            width: 38px;
+            height: 38px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            text-decoration: none;
+        }
+
+            .tm-topbar-icon-btn:hover {
+                background: #eff6ff;
+                border-color: #bfdbfe;
+                color: #2563eb;
+            }
+
+        .tm-topbar-notif-dot {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            width: 7px;
+            height: 7px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid white;
+        }
+
+        .tm-topbar-divider {
+            width: 1px;
+            height: 28px;
+            background: #e2e8f0;
+            margin: 0 4px;
+        }
+
+        .tm-topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 6px 12px 6px 7px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+            .tm-topbar-user:hover {
+                background: #eff6ff;
+                border-color: #bfdbfe;
+            }
+
+        .tm-topbar-avatar {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .tm-topbar-username {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .tm-topbar-user i {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
+        /* ── CONTENT ─────────────────────────────────── */
+        .tm-layout-content {
+            margin-left: 270px;
+            padding: 28px 32px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* ── CHATBOT ─────────────────────────────────── */
+        #chatbotBtn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(37,99,235,0.45);
+            z-index: 1040;
+            transition: 0.3s;
+            animation: pulseGlow 2.5s ease infinite;
+        }
+
+            #chatbotBtn:hover {
+                transform: scale(1.1);
+            }
+
+        #chatbotBox {
+            position: fixed;
+            bottom: 96px;
+            right: 28px;
+            width: 375px;
+            height: 510px;
+            background: white;
+            border-radius: 22px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 1040;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* scrollbar for chat */
+        #chatMessages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #chatMessages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chatMessages::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+
+        /* Fix Bootstrap modal z-index conflicts */
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+
+        .modal-dialog {
+            z-index: 1056 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 1050 !important;
+        }
+
+        .modal {
+            z-index: 1055 !important;
+        }
+
+        /* ═══════════════════════════════════════════
+   GLOBAL PROFESSIONAL DATATABLE STYLES
+   Add to Site.css or inside _Layout.cshtml <style>
+═══════════════════════════════════════════ */
+
+/* TABLE WRAPPER */
+.dataTables_wrapper {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    border: 1px solid #f1f5f9;
+    margin-top: 10px;
+}
+
+/* TOP CONTROLS: show entries + search */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 18px;
+}
+
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    padding: 6px 10px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #334155;
+    outline: none;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dataTables_wrapper .dataTables_length select:focus {
+    border-color: #2563eb;
+    background: white;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    padding: 8px 14px 8px 36px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #334155;
+    outline: none;
+    background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+    transition: 0.2s;
+    min-width: 220px;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    border-color: #2563eb;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+/* TABLE */
+table.dataTable {
+    border-collapse: separate !important;
+    border-spacing: 0 6px !important;
+    width: 100% !important;
+}
+
+/* THEAD */
+table.dataTable thead th {
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    padding: 14px 16px !important;
+    border: none !important;
+    white-space: nowrap;
+}
+
+table.dataTable thead th:first-child {
+    border-radius: 10px 0 0 10px !important;
+}
+
+table.dataTable thead th:last-child {
+    border-radius: 0 10px 10px 0 !important;
+}
+
+/* Sort icons */
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background-image: none !important;
+    padding-right: 24px !important;
+    position: relative;
+}
+
+table.dataTable thead .sorting::after,
+table.dataTable thead .sorting_asc::after,
+table.dataTable thead .sorting_desc::after {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: #cbd5e1;
+}
+
+table.dataTable thead .sorting::after { content: '\f0dc'; }
+table.dataTable thead .sorting_asc::after { content: '\f0de'; color: #2563eb; }
+table.dataTable thead .sorting_desc::after { content: '\f0dd'; color: #2563eb; }
+
+/* TBODY ROWS */
+table.dataTable tbody tr {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+    transition: all 0.2s ease !important;
+    animation: rowFadeIn 0.3s ease forwards;
+    opacity: 0;
+}
+
+table.dataTable tbody tr:nth-child(1)  { animation-delay: 0.03s; }
+table.dataTable tbody tr:nth-child(2)  { animation-delay: 0.06s; }
+table.dataTable tbody tr:nth-child(3)  { animation-delay: 0.09s; }
+table.dataTable tbody tr:nth-child(4)  { animation-delay: 0.12s; }
+table.dataTable tbody tr:nth-child(5)  { animation-delay: 0.15s; }
+table.dataTable tbody tr:nth-child(6)  { animation-delay: 0.18s; }
+table.dataTable tbody tr:nth-child(7)  { animation-delay: 0.21s; }
+table.dataTable tbody tr:nth-child(8)  { animation-delay: 0.24s; }
+table.dataTable tbody tr:nth-child(9)  { animation-delay: 0.27s; }
+table.dataTable tbody tr:nth-child(10) { animation-delay: 0.30s; }
+
+@@keyframes rowFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+table.dataTable tbody tr:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.1) !important;
+    background: #fafbff !important;
+}
+
+/* Striped override — we do our own */
+table.dataTable tbody tr.odd  { background: #ffffff !important; }
+table.dataTable tbody tr.even { background: #fafcff !important; }
+
+table.dataTable tbody tr.even:hover,
+table.dataTable tbody tr.odd:hover {
+    background: #fafbff !important;
+}
+
+/* TBODY CELLS */
+table.dataTable tbody td {
+    padding: 14px 16px !important;
+    font-size: 13.5px !important;
+    color: #334155 !important;
+    border: none !important;
+    border-top: 1px solid #f1f5f9 !important;
+    vertical-align: middle !important;
+}
+
+table.dataTable tbody td:first-child {
+    border-left: 3px solid transparent !important;
+    border-radius: 10px 0 0 10px !important;
+    font-weight: 700 !important;
+    color: #94a3b8 !important;
+    font-size: 12px !important;
+}
+
+table.dataTable tbody tr:hover td:first-child {
+    border-left-color: #2563eb !important;
+    color: #2563eb !important;
+}
+
+table.dataTable tbody td:last-child {
+    border-radius: 0 10px 10px 0 !important;
+}
+
+/* PRIORITY BADGES */
+td .priority-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.priority-low    { background: #f0fdf4; color: #16a34a; }
+.priority-medium { background: #fff7ed; color: #ea580c; }
+.priority-high   { background: #fef2f2; color: #dc2626; }
+
+/* PROGRESS STATUS BADGES */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-pending     { background: #fff7ed; color: #ea580c; }
+.status-inprogress  { background: #eff6ff; color: #2563eb; }
+.status-completed   { background: #f0fdf4; color: #16a34a; }
+
+/* PROGRESS BAR */
+.progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 100px;
+}
+
+.progress-bar-outer {
+    flex: 1;
+    height: 7px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-inner {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease;
+}
+
+.progress-0   { width: 0%;   background: #e2e8f0; }
+.progress-50  { width: 50%;  background: linear-gradient(90deg, #3b82f6, #2563eb); }
+.progress-100 { width: 100%; background: linear-gradient(90deg, #22c55e, #16a34a); }
+
+.progress-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    white-space: nowrap;
+    min-width: 32px;
+}
+
+/* BOTTOM CONTROLS */
+.dataTables_wrapper .dataTables_info {
+    font-size: 12.5px;
+    color: #94a3b8;
+    font-weight: 500;
+    padding-top: 16px;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    padding-top: 12px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 6px 13px !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    font-size: 13px !important;
+    color: #475569 !important;
+    margin: 0 3px !important;
+    background: white !important;
+    transition: all 0.2s !important;
+    cursor: pointer !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #eff6ff !important;
+    border-color: #2563eb !important;
+    color: #2563eb !important;
+    box-shadow: none !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    border-color: #2563eb !important;
+    color: white !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35) !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    color: #cbd5e1 !important;
+    border-color: #f1f5f9 !important;
+    cursor: not-allowed !important;
+}
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="tm-layout-sidebar">
+        <div class="tm-layout-logo">
+            <div class="tm-layout-logo-inner">
+                <div class="tm-layout-logo-icon">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div>
+                    <div class="tm-layout-logo-text">Task Management</div>
+                    <div class="tm-layout-logo-sub">System v1.0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tm-sidebar-user">
+            <div class="tm-sidebar-user-avatar">A</div>
+            <div>
+                <div class="tm-sidebar-user-name">Admin</div>
+                <div class="tm-sidebar-user-role">Administrator</div>
+            </div>
+            <div class="tm-sidebar-online"></div>
+        </div>
+
+        <div class="tm-menu-label">Main Menu</div>
+
+        <div class="tm-layout-menu" id="sidebarMenu">
+            <a href="/Home/Index">
+                <div class="menu-icon"><i class="fa-solid fa-house"></i></div>
+                Home
+            </a>
+            <a href="/Home/Dashboard">
+                <div class="menu-icon"><i class="fa-solid fa-chart-line"></i></div>
+                Dashboard
+            </a>
+            <a href="/Home/Taskcreation">
+                <div class="menu-icon"><i class="fa-solid fa-list-check"></i></div>
+                Tasks
+            </a>
+            <a href="/Home/employee">
+                <div class="menu-icon"><i class="fa-solid fa-users"></i></div>
+                Employees
+            </a>
+            <a href="/Home/TaskAssign">
+                <div class="menu-icon"><i class="fa-solid fa-user-check"></i></div>
+                Assign Task
+            </a>
+            <a href="/Home/TaskProgress">
+                <div class="menu-icon"><i class="fa-solid fa-chart-simple"></i></div>
+                Progress
+            </a>
+            <a href="/Home/Reports">
+                <div class="menu-icon"><i class="fa-solid fa-file-export"></i></div>
+                Reports
+            </a>
+            <a href="/Home/Calendar">
+                <div class="menu-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                Calendar
+            </a>
+            <a href="/Home/Voice">
+                <div class="menu-icon"><i class="fa-solid fa-microphone"></i></div>
+                Voice
+            </a>
+
+            <div class="tm-menu-label" style="padding-left:0;margin-top:8px;">Account</div>
+
+            <a href="/Account/Logout" class="logout-link">
+                <div class="menu-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+                Logout
+            </a>
+        </div>
+
+        <div class="tm-sidebar-bottom">
+            <div class="tm-sidebar-version">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>All systems operational</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOPBAR -->
+    <div class="tm-layout-topbar">
+        <div class="tm-topbar-left">
+            <div class="tm-topbar-breadcrumb">
+
+                <span class="tm-topbar-breadcrumb-sep"></span>
+                <div class="tm-layout-topbar-title">@ViewBag.Title</div>
+            </div>
+        </div>
+
+
+       
+        <div class="tm-topbar-user">
+            <div class="tm-topbar-avatar">A</div>
+            <span class="tm-topbar-username">Admin</span>
+
+        </div>
+    </div>
+
+
+    <!-- CONTENT -->
+    <div class="tm-layout-content">@RenderBody()</div>
+
+    <!-- CHATBOT BUTTON -->
+    <div id="chatbotBtn" onclick="toggleChat()" title="TMS Assistant">
+        <i class="fa-solid fa-robot" style="color:white;font-size:22px;"></i>
+    </div>
+
+    <!-- CHATBOT BOX -->
+    <div id="chatbotBox" style="position:fixed;bottom:96px;right:28px;width:375px;height:510px;background:white;border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,0.15);display:none;flex-direction:column;z-index:9999;overflow:hidden;border:1px solid #e2e8f0;">
+        <div style="background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 60%,#2563eb 100%);padding:18px 20px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;">
+            <div style="position:absolute;width:140px;height:140px;background:rgba(255,255,255,0.05);border-radius:50%;top:-50px;right:-30px;pointer-events:none;"></div>
+            <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1;">
+                <div style="width:42px;height:42px;background:rgba(255,255,255,0.15);border-radius:12px;display:flex;justify-content:center;align-items:center;border:1px solid rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-robot" style="color:white;font-size:18px;"></i>
+                </div>
+                <div>
+                    <div style="color:white;font-weight:700;font-size:15px;">TMS Assistant</div>
+                    <div style="color:rgba(255,255,255,0.6);font-size:12px;display:flex;align-items:center;gap:5px;">
+                        <div style="width:6px;height:6px;background:#22c55e;border-radius:50%;"></div>
+                        Always here to help
+                    </div>
+                </div>
+            </div>
+            <div onclick="toggleChat()" style="width:34px;height:34px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;transition:0.2s;position:relative;z-index:1;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                <i class="fa-solid fa-xmark" style="color:white;font-size:15px;"></i>
+            </div>
+        </div>
+        <div id="chatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fafc;">
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+                <div style="width:32px;height:32px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:50%;display:flex;justify-content:center;align-items:center;flex-shrink:0;">
+                    <i class="fa-solid fa-robot" style="color:white;font-size:13px;"></i>
+                </div>
+                <div style="background:white;padding:11px 14px;border-radius:0 14px 14px 14px;max-width:265px;font-size:13.5px;color:#334155;box-shadow:0 2px 8px rgba(0,0,0,0.07);line-height:1.55;border:1px solid #f1f5f9;">
+                    Hi! I am your <strong>Task Management Assistant</strong>. Ask me anything about tasks, employees, assignments, progress or reports!
+                </div>
+            </div>
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid #e2e8f0;background:white;display:flex;gap:8px;align-items:center;">
+            <input type="text" id="chatInput" placeholder="Ask me anything..." style="flex:1;padding:10px 16px;border:1.5px solid #e2e8f0;border-radius:22px;font-size:13.5px;outline:none;font-family:Inter,Arial,sans-serif;transition:0.2s;" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'" onkeypress="if(event.which==13) sendMessage()" />
+            <button onclick="sendMessage()" style="width:40px;height:40px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;border-radius:50%;cursor:pointer;display:flex;justify-content:center;align-items:center;box-shadow:0 4px 12px rgba(37,99,235,0.35);transition:0.2s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+                <i class="fa-solid fa-paper-plane" style="color:white;font-size:14px;"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ── ACTIVE MENU HIGHLIGHT ──────────────────────
+        (function () {
+            let path = window.location.pathname.toLowerCase();
+            document.querySelectorAll('#sidebarMenu a').forEach(function (a) {
+                if (a.getAttribute('href') && path === a.getAttribute('href').toLowerCase()) {
+                    a.classList.add('active');
+                }
+            });
+        })();
+
+        // ── CHATBOT ───────────────────────────────────
+        function toggleChat() {
+            let box = document.getElementById('chatbotBox');
+            if (box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'flex';
+                document.getElementById('chatInput').focus();
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        function addMessage(text, isUser) {
+            let messages = document.getElementById('chatMessages');
+            let div = document.createElement('div');
+            div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;' + (isUser ? 'flex-direction:row-reverse;' : '');
+            let avatar = document.createElement('div');
+            avatar.style.cssText = 'width:32px;height:32px;border-radius:50%;display:flex;justify-content:center;align-items:center;flex-shrink:0;' + (isUser ? 'background:linear-gradient(135deg,#e2e8f0,#cbd5e1);' : 'background:linear-gradient(135deg,#2563eb,#1d4ed8);');
+            avatar.innerHTML = isUser ? '<i class="fa-solid fa-user" style="color:#64748b;font-size:13px;"></i>' : '<i class="fa-solid fa-robot" style="color:white;font-size:13px;"></i>';
+            let bubble = document.createElement('div');
+            bubble.style.cssText = 'padding:11px 14px;border-radius:' + (isUser ? '14px 0 14px 14px' : '0 14px 14px 14px') + ';max-width:265px;font-size:13.5px;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,0.07);white-space:pre-line;' + (isUser ? 'background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white;' : 'background:white;color:#334155;border:1px solid #f1f5f9;');
+            bubble.innerText = text;
+            div.appendChild(avatar);
+            div.appendChild(bubble);
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addTyping() {
+            let messages = document.getElementById('chatMessages');
+            let div = document.createElement('div');
+            div.id = 'typingIndicator';
+            div.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
+            div.innerHTML = '<div style="width:32px;height:32px;background:linear-gradient(135deg,#2563eb,#1d4ed8);border-radius:50%;display:flex;justify-content:center;align-items:center;flex-shrink:0;"><i class="fa-solid fa-robot" style="color:white;font-size:13px;"></i></div><div style="background:white;padding:12px 16px;border-radius:0 14px 14px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.07);border:1px solid #f1f5f9;"><div style="display:flex;gap:5px;align-items:center;height:18px;"><div style="width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:bounce 1s infinite;"></div><div style="width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:bounce 1s infinite 0.2s;"></div><div style="width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:bounce 1s infinite 0.4s;"></div></div></div>';
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function removeTyping() {
+            let t = document.getElementById('typingIndicator');
+            if (t) t.remove();
+        }
+
+        function sendMessage() {
+            let input = document.getElementById('chatInput');
+            let text = input.value.trim();
+            if (!text) return;
+            addMessage(text, true);
+            input.value = '';
+            addTyping();
+            setTimeout(function () { removeTyping(); addMessage(getBotReply(text), false); }, 900);
+        }
+
+        function getBotReply(text) {
+            text = text.toLowerCase();
+            if (text.includes('dashboard')) return 'The Dashboard shows 4 summary cards:\n• Total Tasks\n• Pending Tasks\n• Completed Tasks\n• Overdue Tasks';
+            if (text.includes('total task')) return 'Total Tasks shows the count of all tasks created in the system.';
+            if (text.includes('pending task')) return 'Pending Tasks shows tasks whose progress status is marked as Pending.';
+            if (text.includes('completed task')) return 'Completed Tasks shows tasks marked as Completed in the Progress section.';
+            if (text.includes('overdue task')) return 'Overdue Tasks shows tasks whose due date has already passed today.';
+            if (text.includes('add task') || text.includes('create task') || text.includes('new task')) return 'To add a task:\n1. Go to Tasks page\n2. Click Add Task button\n3. Fill in Title, Priority, Description, Start Date and Due Date\n4. Click Save.';
+            if (text.includes('edit task') || text.includes('update task')) return 'To edit a task:\n1. Go to Tasks page\n2. Click the blue edit icon\n3. Update the details\n4. Click Update.';
+            if (text.includes('delete task') || text.includes('remove task')) return 'To delete a task:\n1. Go to Tasks page\n2. Click the red delete icon\n3. Confirm by clicking Yes.';
+            if (text.includes('priority')) return 'Priority has 3 options:\n• Low\n• Medium\n• High';
+            if (text.includes('due date')) return 'Due Date is the deadline for the task. Tasks past their due date appear as Overdue on the dashboard.';
+            if (text.includes('task')) return 'The Tasks page lets you create, view, edit and delete tasks.';
+            if (text.includes('add employee') || text.includes('create employee')) return 'To add an employee:\n1. Go to Employees page\n2. Click Add Employee\n3. Fill in Name, Email, Mobile and Role\n4. Click Save.';
+            if (text.includes('employee')) return 'The Employees page lets you manage all employees. Each employee has Name, Email, Mobile and Role.';
+            if (text.includes('assign task') || text.includes('assignment')) return 'To assign a task:\n1. Go to Assign Task page\n2. Click Assign Task\n3. Select Employee and Task\n4. Pick Assigned Date\n5. Click Save.';
+            if (text.includes('progress status')) return 'Progress Status:\n• Pending = 0%\n• In Progress = 50%\n• Completed = 100%';
+            if (text.includes('progress')) return 'The Progress page lets you track task completion. Select an employee to see their assigned tasks.';
+            if (text.includes('calendar')) return 'The Calendar shows all task assignment dates. Blue dates have tasks assigned. Click any blue date to see details.';
+            if (text.includes('pdf')) return 'To export PDF:\n1. Go to Reports page\n2. Click Export PDF button.';
+            if (text.includes('excel')) return 'To export Excel:\n1. Go to Reports page\n2. Click Export Excel button.';
+            if (text.includes('report')) return 'The Reports page shows summary cards, 4 charts and data tables. Export to PDF or Excel.';
+            if (text.includes('login')) return 'To login:\n1. Enter Username or Email\n2. Enter Password\n3. Click Sign In.';
+            if (text.includes('logout')) return 'Click the Logout option in the left sidebar to sign out.';
+            if (text.includes('hello') || text.includes('hi') || text.includes('hey')) return 'Hello! I am your Task Management Assistant.\n\nI can help you with:\n• Dashboard\n• Tasks\n• Employees\n• Task Assignment\n• Task Progress\n• Calendar\n• Reports';
+            if (text.includes('help')) return 'I can help you with:\n• Dashboard\n• Tasks\n• Employees\n• Task Assignment\n• Task Progress\n• Calendar\n• Reports';
+            if (text.includes('thank')) return 'You are welcome! Feel free to ask anytime.';
+            return 'I am not sure about that. Try asking:\n• "How to add a task"\n• "How to assign a task"\n• "How to update progress"\n• "How to use calendar"\n• "How to export report"';
+        }
+
+        // Fix modal close button issue
+        $(document).on('click', '.modal .btn-close, .modal [data-bs-dismiss="modal"]', function () {
+            var modalId = $(this).closest('.modal').attr('id');
+            $('#' + modalId).modal('hide');
+        });
+    </script>
+</body>
+</html>

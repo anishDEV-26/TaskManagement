@@ -1,0 +1,594 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @@keyframes countUp {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .home-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    /* HERO SECTION */
+    .home-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+        border-radius: 24px;
+        padding: 60px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+        min-height: 280px;
+    }
+
+        .home-hero::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .home-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: 30%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+
+    .hero-left {
+        animation: fadeInLeft 0.8s ease forwards;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.15);
+        color: #93c5fd;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .hero-title {
+        font-size: 42px;
+        font-weight: bold;
+        color: white;
+        line-height: 1.2;
+        margin-bottom: 15px;
+    }
+
+        .hero-title span {
+            color: #60a5fa;
+        }
+
+    .hero-subtitle {
+        font-size: 16px;
+        color: rgba(255,255,255,0.7);
+        line-height: 1.7;
+        max-width: 500px;
+        margin-bottom: 30px;
+    }
+
+    .hero-btns {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .hero-btn-primary {
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 13px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+        .hero-btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37,99,235,0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+    .hero-btn-secondary {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 13px 28px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        backdrop-filter: blur(10px);
+    }
+
+        .hero-btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+    .hero-right {
+        animation: float 3s ease-in-out infinite;
+        z-index: 1;
+    }
+
+    .hero-icon-box {
+        width: 180px;
+        height: 180px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+
+        .hero-icon-box i {
+            font-size: 80px;
+            color: #60a5fa;
+        }
+
+    /* STATS SECTION */
+    .home-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 18px;
+        padding: 25px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        transition: 0.3s;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+    }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: #0f172a;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    /* FEATURES SECTION */
+    .home-features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 18px;
+        padding: 30px 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        transition: 0.3s;
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+    }
+
+        .feature-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .feature-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .feature-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .feature-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .feature-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .feature-card:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            text-decoration: none;
+        }
+
+    .feature-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        margin-bottom: 18px;
+    }
+
+    .feature-title {
+        font-size: 17px;
+        font-weight: bold;
+        color: #0f172a;
+        margin-bottom: 8px;
+    }
+
+    .feature-desc {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .feature-arrow {
+        margin-top: 18px;
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: 0.3s;
+    }
+
+    .feature-card:hover .feature-arrow {
+        gap: 10px;
+    }
+
+    /* BOTTOM SECTION */
+    .home-bottom {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 18px;
+        padding: 30px 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        animation: fadeInUp 0.6s ease forwards;
+        opacity: 0;
+        animation-delay: 0.3s;
+    }
+
+    .info-card-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #0f172a;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .quick-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .quick-link:last-child {
+            border-bottom: none;
+        }
+
+        .quick-link:hover {
+            padding-left: 5px;
+            text-decoration: none;
+        }
+
+    .quick-link-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .quick-link-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .quick-link-desc {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+
+    .tip-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+        .tip-item:last-child {
+            border-bottom: none;
+        }
+
+    .tip-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 6px;
+        flex-shrink: 0;
+    }
+
+    .tip-text {
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="home-wrapper">
+
+    <!-- HERO -->
+    <div class="home-hero">
+        <div class="hero-left">
+            <div class="hero-badge">
+                <i class="fa-solid fa-circle" style="font-size:8px;color:#4ade80;"></i>
+                Task Management System
+            </div>
+            <div class="hero-title">
+                Manage Tasks,<br><span>Track Progress</span><br>Stay Organized
+            </div>
+            <div class="hero-subtitle">
+                A complete solution to manage your tasks, employees, assignments and progress all in one place with real-time updates.
+            </div>
+           </div>
+        <div class="hero-right">
+            <div class="hero-icon-box">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+        </div>
+    </div>
+
+    
+
+   
+
+   
+
+    <div class="info-card">
+        <div class="info-card-title">
+            <i class="fa-solid fa-lightbulb" style="color:#d97706;"></i>
+            Tips and Guide
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:#2563eb;"></div>
+            <div class="tip-text">Go to <strong>Tasks</strong> page to create new tasks with priority levels and due dates.</div>
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:#7c3aed;"></div>
+            <div class="tip-text">Add employees in <strong>Employees</strong> page before assigning tasks to them.</div>
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:#16a34a;"></div>
+            <div class="tip-text">Use <strong>Assign Task</strong> to assign specific tasks to employees with a deadline.</div>
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:#ea580c;"></div>
+            <div class="tip-text">Update task status in <strong>Progress</strong> page — Pending, In Progress or Completed.</div>
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:#dc2626;"></div>
+            <div class="tip-text">Generate <strong>Reports</strong> to export all data as PDF or Excel with charts.</div>
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:aqua;"></div>
+            <div class="tip-text">Click the <strong>Calendar</strong> to see which tasks are assigned to each employee on a particular date. </div>
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:green;"></div>
+            <div class="tip-text">Click the <strong>Voice</strong> icon to create and assign task using your voice.</div>
+        </div>
+        <div class="tip-item">
+            <div class="tip-dot" style="background:#0f766e;"></div>
+            <div class="tip-text">Use the <strong>Chatbot</strong> at the bottom right corner for instant help and guidance.</div>
+        </div>
+    </div>
+    </div>
+
+
+
+<script>
+    $(document).ready(function () {
+        // Load dashboard counts for home stats
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetDashboardCounts",
+            dataType: "json",
+            success: function (data) {
+                if (data != null) {
+                    animateCount('homeTotalTasks', data.TotalTasks);
+                    animateCount('homePendingTasks', data.PendingTasks);
+                    animateCount('homeCompletedTasks', data.CompletedTasks);
+                }
+            }
+        });
+
+        // Load total employees
+        $.ajax({
+            type: "GET",
+            url: "/Home/GetEmployeeList",
+            dataType: "json",
+            success: function (data) {
+                if (data != null && data.GetList != null) {
+                    animateCount('homeTotalEmployees', data.GetList.length);
+                }
+            }
+        });
+    });
+
+    function animateCount(id, target) {
+        let start = 0;
+        let duration = 1500;
+        let step = target / (duration / 16);
+        let current = start;
+        let timer = setInterval(function () {
+            current += step;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            document.getElementById(id).innerText = Math.floor(current);
+        }, 16);
+    }
+</script>

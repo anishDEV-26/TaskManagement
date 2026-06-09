@@ -1,0 +1,528 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Task Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 900px;
+            min-height: 550px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .login-left {
+            flex: 1;
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .login-left-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .login-left-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .login-left-subtitle {
+            font-size: 15px;
+            opacity: 0.8;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .login-right {
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 35px;
+        }
+
+        .login-group {
+            margin-bottom: 20px;
+        }
+
+            .login-group label {
+                display: block;
+                font-size: 14px;
+                font-weight: 600;
+                color: #334155;
+                margin-bottom: 8px;
+            }
+
+        .login-input-wrap {
+            position: relative;
+        }
+
+            .login-input-wrap i {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+                font-size: 16px;
+            }
+
+        .login-input {
+            width: 100%;
+            padding: 13px 13px 13px 42px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+            .login-input:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+            .login-btn:hover {
+                background: #1d4ed8;
+                transform: translateY(-1px);
+            }
+
+        .login-forgot {
+            text-align: right;
+            margin-top: 8px;
+        }
+
+            .login-forgot a {
+                font-size: 13px;
+                color: #2563eb;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+                .login-forgot a:hover {
+                    text-decoration: underline;
+                }
+
+        .login-signup {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+            .login-signup a {
+                color: #2563eb;
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+        .login-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        /* FORGOT PASSWORD MODAL */
+        .fp-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+            .fp-overlay.show {
+                display: flex;
+            }
+
+        .fp-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            width: 450px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .fp-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .fp-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        .fp-group {
+            margin-bottom: 18px;
+        }
+
+            .fp-group label {
+                display: block;
+                font-size: 14px;
+                font-weight: 600;
+                color: #334155;
+                margin-bottom: 8px;
+            }
+
+        .fp-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+            .fp-input:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            }
+
+        .fp-btn {
+            width: 100%;
+            padding: 13px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 5px;
+        }
+
+            .fp-btn:hover {
+                background: #1d4ed8;
+            }
+
+        .fp-cancel {
+            width: 100%;
+            padding: 11px;
+            background: white;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+            .fp-cancel:hover {
+                background: #f1f5f9;
+            }
+
+        .fp-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .fp-success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .fp-hint {
+            background: #eff6ff;
+            color: #1e40af;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .fp-step2 {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-left">
+            <div class="login-left-icon">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="login-left-title">Task Management System</div>
+            <div class="login-left-subtitle">Manage your tasks, employees and track progress all in one place.</div>
+        </div>
+        <div class="login-right">
+            <div class="login-title">Welcome back!</div>
+            <div class="login-subtitle">Please sign in to your account</div>
+
+            <div class="login-error" id="loginError"></div>
+
+            <div class="login-group">
+                <label><i class="fa-solid fa-user" style="margin-right:6px;color:#2563eb;"></i> Username or Email</label>
+                <div class="login-input-wrap">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="inputUsernameEmail" class="login-input" placeholder="Enter username or email" />
+                </div>
+            </div>
+
+            <div class="login-group">
+                <label><i class="fa-solid fa-lock" style="margin-right:6px;color:#2563eb;"></i> Password</label>
+                <div class="login-input-wrap">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="inputPassword" class="login-input" placeholder="Enter password" />
+                </div>
+                <div class="login-forgot">
+                    <a onclick="OpenForgotPassword()">Forgot password?</a>
+                </div>
+            </div>
+
+            <button class="login-btn" onclick="Login()">
+                <i class="fa-solid fa-right-to-bracket" style="margin-right:8px;"></i> Sign In
+            </button>
+
+            <div class="login-signup">
+                Don't have an account? <a href="/Account/Signup">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div class="fp-overlay" id="fpOverlay">
+        <div class="fp-modal">
+            <div class="fp-title"><i class="fa-solid fa-key" style="color:#2563eb;margin-right:8px;"></i> Reset Password</div>
+            <div class="fp-subtitle">Enter your username or email to reset your password</div>
+
+            <div class="fp-error" id="fpError"></div>
+            <div class="fp-success" id="fpSuccess"></div>
+            <div class="fp-hint" id="fpHint"></div>
+
+            <!-- Step 1 - Enter username/email -->
+            <div id="fpStep1">
+                <div class="fp-group">
+                    <label>Username or Email</label>
+                    <input type="text" id="fpUsernameEmail" class="fp-input" placeholder="Enter your username or email" />
+                </div>
+                <button class="fp-btn" onclick="VerifyUser()">
+                    <i class="fa-solid fa-search" style="margin-right:6px;"></i> Find My Account
+                </button>
+                <button class="fp-cancel" onclick="CloseForgotPassword()">Cancel</button>
+            </div>
+
+            <!-- Step 2 - Enter new password -->
+            <div class="fp-step2" id="fpStep2">
+                <div class="fp-group">
+                    <label>New Password</label>
+                    <input type="password" id="fpNewPassword" class="fp-input" placeholder="Enter new password" />
+                </div>
+                <div class="fp-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="fpConfirmPassword" class="fp-input" placeholder="Confirm new password" />
+                </div>
+                <button class="fp-btn" onclick="ResetPassword()">
+                    <i class="fa-solid fa-lock" style="margin-right:6px;"></i> Reset Password
+                </button>
+                <button class="fp-cancel" onclick="CloseForgotPassword()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function Login() {
+            let usernameoremail = $("#inputUsernameEmail").val();
+            let password = $("#inputPassword").val();
+
+            if (usernameoremail == '' || password == '') {
+                $("#loginError").text("Please fill in all fields.").show();
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Account/LoginUser",
+                data: { usernameoremail: usernameoremail, password: password },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = "/Home/Index";
+                    } else {
+                        $("#loginError").text(response.message).show();
+                    }
+                },
+                error: function () {
+                    $("#loginError").text("Something went wrong. Please try again.").show();
+                }
+            });
+        }
+
+        $(document).keypress(function (e) {
+            if (e.which == 13) Login();
+        });
+
+        function OpenForgotPassword() {
+            $("#fpOverlay").addClass('show');
+            $("#fpError").hide();
+            $("#fpSuccess").hide();
+            $("#fpHint").hide();
+            $("#fpUsernameEmail").val('');
+            $("#fpNewPassword").val('');
+            $("#fpConfirmPassword").val('');
+            $("#fpStep1").show();
+            $("#fpStep2").hide();
+        }
+
+        function CloseForgotPassword() {
+            $("#fpOverlay").removeClass('show');
+        }
+
+        function VerifyUser() {
+            let usernameoremail = $("#fpUsernameEmail").val().trim();
+
+            if (usernameoremail == '') {
+                $("#fpError").text("Please enter your username or email.").show();
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Home/GetUserForReset",
+                data: { usernameoremail: usernameoremail },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        $("#fpError").hide();
+                        $("#fpHint").text("Account found: " + response.fullname + "  |  Phone: " + response.maskedphone).show();
+                        $("#fpStep1").hide();
+                        $("#fpStep2").show();
+                    } else {
+                        $("#fpError").text(response.message).show();
+                    }
+                },
+                error: function () {
+                    $("#fpError").text("Something went wrong. Please try again.").show();
+                }
+            });
+        }
+
+        function ResetPassword() {
+            let usernameoremail = $("#fpUsernameEmail").val().trim();
+            let newpassword = $("#fpNewPassword").val().trim();
+            let confirmpassword = $("#fpConfirmPassword").val().trim();
+
+            if (newpassword == '' || confirmpassword == '') {
+                $("#fpError").text("Please fill in all password fields.").show();
+                return;
+            }
+
+            if (newpassword != confirmpassword) {
+                $("#fpError").text("Passwords do not match.").show();
+                return;
+            }
+
+            if (newpassword.length < 6) {
+                $("#fpError").text("Password must be at least 6 characters.").show();
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Home/ResetPassword",
+                data: { usernameoremail: usernameoremail, newpassword: newpassword },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        $("#fpError").hide();
+                        $("#fpSuccess").text(response.message).show();
+                        setTimeout(function () {
+                            CloseForgotPassword();
+                        }, 2000);
+                    } else {
+                        $("#fpError").text(response.message).show();
+                    }
+                },
+                error: function () {
+                    $("#fpError").text("Something went wrong. Please try again.").show();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

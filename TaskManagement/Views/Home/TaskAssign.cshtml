@@ -1,0 +1,315 @@
+﻿@{
+    ViewBag.Title = "Task Assign";
+}
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<style>
+
+    .assign-main-wrapper {
+        width: 100%;
+    }
+
+    .assign-page-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #1e293b;
+    }
+
+    .modal-dialog {
+        max-width: 900px;
+    }
+
+    .modal-content {
+        border-radius: 18px;
+        border: none;
+    }
+
+    .modal-header {
+        padding: 20px 30px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-title {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .assign-form-container {
+        background: white;
+        padding: 30px;
+        border-radius: 18px;
+    }
+
+    .assign-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 25px;
+    }
+
+    .assign-input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .assign-input-group label {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 16px;
+        }
+
+            .assign-input-group label i {
+                margin-right: 8px;
+                color: #0f766e;
+            }
+
+        .assign-input-group select,
+        .assign-input-group input {
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            outline: none;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+            .assign-input-group select:focus,
+            .assign-input-group input:focus {
+                border-color: #0f766e;
+                box-shadow: 0 0 5px rgba(15,118,110,0.4);
+            }
+
+    .assign-btn-container {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .assign-btn {
+        border: none;
+        padding: 13px 24px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        font-size: 15px;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .assign-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .assign-save-btn {
+        position: relative;
+        padding: 0.75em 1.5em;
+        border-radius: 0.625em;
+        border: 2px solid #4f46e5;
+        font-size: 0.938em;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.125em;
+        background: transparent;
+        color: #4f46e5;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 0 0 0 transparent;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .assign-save-btn:hover {
+            background: rgba(100, 150, 229, 0.1);
+            box-shadow: 0 0 25px 5px rgba(79, 70, 229, 0.3);
+            color: purple;
+        }
+
+        .assign-save-btn::before {
+            content: "";
+            display: block;
+            width: 0px;
+            height: 86%;
+            position: absolute;
+            top: 7%;
+            left: 0%;
+            opacity: 0;
+            background: linear-gradient(90deg, transparent, #4f46e5, transparent);
+            box-shadow: 0 0 50px 30px #00ffff;
+            transform: skewX(-20deg);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .assign-save-btn:hover::before {
+            animation: neon-shine 0.6s 0s infinite;
+        }
+
+    @@keyframes neon-shine {
+        from {
+            opacity: 0;
+            left: 0%;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        to {
+            opacity: 0;
+            left: 100%;
+        }
+    }
+
+    /* ✅ ADDED: subtask dropdown styles */
+    .view-subtask-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        min-width: 220px;
+        z-index: 9999;
+        padding: 8px;
+        display: none;
+    }
+
+        .view-subtask-dropdown.show {
+            display: block;
+        }
+
+    .view-subtask-item {
+        padding: 8px 10px;
+        font-size: 13px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+        .view-subtask-item:last-child {
+            border-bottom: none;
+        }
+
+    .view-subtask-empty {
+        padding: 10px;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+    }
+
+    @@media(max-width:900px) {
+        .assign-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="assign-main-wrapper">
+
+    <h1 class="assign-page-title">
+        <i class="fa-solid fa-list-check"></i>
+        Task Assignment
+    </h1>
+
+    <button type="button"
+            class="btn btn-success mb-4"
+            data-bs-toggle="modal"
+            data-bs-target="#assignTaskModal">
+        <i class="fa-solid fa-plus"></i>
+        Assign Task
+    </button>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal fade"
+     id="assignTaskModal"
+     tabindex="-1"
+     aria-hidden="true"
+     data-bs-backdrop="static">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Task Assignment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="assign-form-container">
+                    <div class="assign-form-grid">
+
+                        <div class="assign-input-group">
+                            <label><i class="fa-solid fa-user"></i> Select Employee</label>
+                            <select id="assignEmployee">
+                                <option value="">Choose Employee</option>
+                            </select>
+                        </div>
+
+                        <div class="assign-input-group">
+                            <label><i class="fa-solid fa-list-check"></i> Select Task</label>
+                            <select id="assignTask">
+                                <option value="">Choose Task</option>
+                            </select>
+                        </div>
+
+                        <div class="assign-input-group">
+                            <label><i class="fa-solid fa-calendar-days"></i> Assigned Date</label>
+                            <input type="date" id="assignDate">
+                        </div>
+
+                    </div>
+
+                    <div class="assign-btn-container">
+                        <button class="assign-btn assign-save-btn" onclick="SaveTaskAssign()">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteAssignModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <i class="fa-solid fa-triangle-exclamation fa-2x text-danger mb-3"></i>
+                <p>Are you sure you want to delete this assignment?</p>
+                <input type="hidden" id="deleteAssignId" />
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-danger" onclick="ConfirmDeleteAssign()">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table id="assignTable" class="table table-striped" style="width:100%">
+    <thead>
+        <tr>
+            <th class="text-center">Sno</th>
+            <th class="text-center">Employee</th>
+            <th class="text-center">Task</th>
+            <th class="text-center">Assigned Date</th>
+            <th class="text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody id="assignTableBody">
+    </tbody>
+</table>
+
+<script src="/javascript/taskassign.js?v=2"></script>

@@ -1,0 +1,405 @@
+﻿@{
+    ViewBag.Title = "Sign Up";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - Task Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+
+        .signup-wrapper {
+            display: flex;
+            width: 950px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .signup-left {
+            width: 320px;
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .signup-left-icon {
+            font-size: 55px;
+            margin-bottom: 20px;
+        }
+
+        .signup-left-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .signup-left-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .signup-left-features {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .signup-left-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+            .signup-left-feature i {
+                font-size: 16px;
+                color: #60a5fa;
+            }
+
+        .signup-right {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .signup-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .signup-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 28px;
+        }
+
+        .signup-grid {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 18px;
+        }
+
+        .signup-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .signup-group.full {
+                grid-column: 1/3;
+            }
+
+            .signup-group label {
+                font-size: 13px;
+                font-weight: 600;
+                color: #334155;
+                margin-bottom: 7px;
+            }
+
+                .signup-group label i {
+                    margin-right: 6px;
+                    color: #2563eb;
+                }
+
+        .signup-input-wrap {
+            position: relative;
+        }
+
+            .signup-input-wrap i.field-icon {
+                position: absolute;
+                left: 13px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+                font-size: 15px;
+            }
+
+        .signup-input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+            .signup-input:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            }
+
+        .terms-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+            .terms-row input[type="checkbox"] {
+                margin-top: 3px;
+                accent-color: #2563eb;
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
+
+            .terms-row label {
+                font-size: 13px;
+                color: #64748b;
+                cursor: pointer;
+                line-height: 1.5;
+            }
+
+            .terms-row a {
+                color: #2563eb;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+                .terms-row a:hover {
+                    text-decoration: underline;
+                }
+
+        .signup-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+            .signup-btn:hover {
+                background: #1d4ed8;
+                transform: translateY(-1px);
+            }
+
+        .signup-login {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+            .signup-login a {
+                color: #2563eb;
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+                .signup-login a:hover {
+                    text-decoration: underline;
+                }
+
+        .signup-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .signup-success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-wrapper">
+        <div class="signup-left">
+            <div class="signup-left-icon">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="signup-left-title">Join Us Today</div>
+            <div class="signup-left-subtitle">Create your account and start managing tasks efficiently.</div>
+            <div class="signup-left-features">
+                <div class="signup-left-feature">
+                    <i class="fa-solid fa-circle-check"></i> Manage tasks easily
+                </div>
+                <div class="signup-left-feature">
+                    <i class="fa-solid fa-circle-check"></i> Track employee progress
+                </div>
+                <div class="signup-left-feature">
+                    <i class="fa-solid fa-circle-check"></i> Generate reports
+                </div>
+                <div class="signup-left-feature">
+                    <i class="fa-solid fa-circle-check"></i> Assign tasks to employees
+                </div>
+            </div>
+        </div>
+        <div class="signup-right">
+            <div class="signup-title">Create Account</div>
+            <div class="signup-subtitle">Fill in the details below to get started</div>
+
+            <div class="signup-error" id="signupError"></div>
+            <div class="signup-success" id="signupSuccess"></div>
+
+            <div class="signup-grid">
+                <div class="signup-group">
+                    <label><i class="fa-solid fa-id-card"></i> Full Name</label>
+                    <div class="signup-input-wrap">
+                        <i class="fa-solid fa-id-card field-icon"></i>
+                        <input type="text" id="inputFullName" class="signup-input" placeholder="Enter full name" />
+                    </div>
+                </div>
+                <div class="signup-group">
+                    <label><i class="fa-solid fa-user"></i> Username</label>
+                    <div class="signup-input-wrap">
+                        <i class="fa-solid fa-user field-icon"></i>
+                        <input type="text" id="inputUsername" class="signup-input" placeholder="Enter username" />
+                    </div>
+                </div>
+                <div class="signup-group">
+                    <label><i class="fa-solid fa-envelope"></i> Email Address</label>
+                    <div class="signup-input-wrap">
+                        <i class="fa-solid fa-envelope field-icon"></i>
+                        <input type="email" id="inputEmail" class="signup-input" placeholder="Enter email address" />
+                    </div>
+                </div>
+                <div class="signup-group">
+                    <label><i class="fa-solid fa-phone"></i> Phone Number</label>
+                    <div class="signup-input-wrap">
+                        <i class="fa-solid fa-phone field-icon"></i>
+                        <input type="text" id="inputPhone" class="signup-input" placeholder="Enter phone number" />
+                    </div>
+                </div>
+                <div class="signup-group">
+                    <label><i class="fa-solid fa-lock"></i> Password</label>
+                    <div class="signup-input-wrap">
+                        <i class="fa-solid fa-lock field-icon"></i>
+                        <input type="password" id="inputPassword" class="signup-input" placeholder="Enter password" />
+                    </div>
+                </div>
+                <div class="signup-group">
+                    <label><i class="fa-solid fa-lock"></i> Confirm Password</label>
+                    <div class="signup-input-wrap">
+                        <i class="fa-solid fa-lock field-icon"></i>
+                        <input type="password" id="inputConfirmPassword" class="signup-input" placeholder="Confirm password" />
+                    </div>
+                </div>
+                <div class="signup-group full">
+                    <div class="terms-row">
+                        <input type="checkbox" id="termsCheck" />
+                        <label for="termsCheck">
+                            I agree to the <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="signup-btn" onclick="Signup()">
+                <i class="fa-solid fa-user-plus" style="margin-right:8px;"></i> Create Account
+            </button>
+
+            <div class="signup-login">
+                Already have an account? <a href="/Account/Login">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function Signup() {
+            let fullname = $("#inputFullName").val().trim();
+            let username = $("#inputUsername").val().trim();
+            let email = $("#inputEmail").val().trim();
+            let phone = $("#inputPhone").val().trim();
+            let password = $("#inputPassword").val().trim();
+            let confirmpassword = $("#inputConfirmPassword").val().trim();
+            let terms = $("#termsCheck").is(':checked');
+
+            if (fullname == '' || username == '' || email == '' || phone == '' || password == '' || confirmpassword == '') {
+                $("#signupError").text("Please fill in all fields.").show();
+                $("#signupSuccess").hide();
+                return;
+            }
+
+            if (password != confirmpassword) {
+                $("#signupError").text("Passwords do not match.").show();
+                $("#signupSuccess").hide();
+                return;
+            }
+
+            if (!terms) {
+                $("#signupError").text("Please agree to the Terms and Conditions.").show();
+                $("#signupSuccess").hide();
+                return;
+            }
+
+            let UserDetails = {
+                fullname: fullname,
+                username: username,
+                email: email,
+                phonenumber: phone,
+                password: password
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/Account/RegisterUser",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(UserDetails),
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        $("#signupSuccess").text(response.message).show();
+                        $("#signupError").hide();
+                        setTimeout(function () {
+                            window.location.href = "/Account/Login";
+                        }, 2000);
+                    } else {
+                        $("#signupError").text(response.message).show();
+                        $("#signupSuccess").hide();
+                    }
+                },
+                error: function () {
+                    $("#signupError").text("Something went wrong. Please try again.").show();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

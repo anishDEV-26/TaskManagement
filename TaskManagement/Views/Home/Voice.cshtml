@@ -1,0 +1,855 @@
+﻿@{
+    ViewBag.Title = "Voice Task";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    .voice-wrapper { max-width: 750px; margin: 0 auto; }
+    .voice-page-title { font-size: 32px; font-weight: bold; margin-bottom: 8px; color: #1e293b; display: flex; align-items: center; gap: 12px; }
+    .voice-page-title i { color: #7c3aed; }
+    .voice-page-subtitle { font-size: 14px; color: #64748b; margin-bottom: 30px; }
+
+    /* MIC CARD */
+    .voice-mic-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px 30px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .voice-instruction {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 14px;
+        color: #1e40af;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        text-align: left;
+    }
+    .voice-instruction i { color: #2563eb; margin-right: 8px; }
+
+    .voice-mic-btn {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #7c3aed, #2563eb);
+        color: white;
+        font-size: 40px;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        box-shadow: 0 6px 20px rgba(124,58,237,0.4);
+        position: relative;
+    }
+    .voice-mic-btn:hover { transform: scale(1.05); }
+    .voice-mic-btn.listening {
+        background: linear-gradient(135deg, #dc2626, #f97316);
+        box-shadow: 0 6px 20px rgba(220,38,38,0.4);
+        animation: mic-pulse 1.2s infinite;
+    }
+    .voice-mic-btn.processing {
+        background: linear-gradient(135deg, #0f766e, #2563eb);
+        box-shadow: 0 6px 20px rgba(15,118,110,0.4);
+    }
+
+    @@keyframes mic-pulse {
+        0%, 100% { box-shadow: 0 6px 20px rgba(220,38,38,0.4), 0 0 0 0 rgba(220,38,38,0.3); }
+        50% { box-shadow: 0 6px 20px rgba(220,38,38,0.4), 0 0 0 20px rgba(220,38,38,0); }
+    }
+
+    .voice-status {
+        font-size: 16px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+    .voice-status.listening { color: #dc2626; }
+    .voice-status.processing { color: #0f766e; }
+    .voice-status.success { color: #16a34a; }
+    .voice-status.error { color: #dc2626; }
+
+    .voice-status-sub {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-bottom: 20px;
+    }
+
+    /* TRANSCRIPT */
+    .voice-transcript-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        min-height: 60px;
+        font-size: 15px;
+        color: #334155;
+        text-align: left;
+        line-height: 1.6;
+        display: none;
+        margin-top: 15px;
+        font-style: italic;
+    }
+    .voice-transcript-box.show { display: block; }
+    .voice-transcript-label { font-size: 12px; color: #94a3b8; margin-bottom: 6px; font-style: normal; font-weight: 600; }
+
+    /* SOUND WAVES */
+    .voice-waves {
+        display: none;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 4px;
+        height: 40px;
+        margin: 15px 0;
+    }
+    .voice-waves.show { display: flex; }
+    .voice-wave-bar {
+        width: 5px;
+        border-radius: 3px;
+        background: linear-gradient(135deg, #7c3aed, #2563eb);
+        animation: wave-anim 0.8s ease-in-out infinite;
+    }
+    .voice-wave-bar:nth-child(1) { animation-delay: 0s; height: 15px; }
+    .voice-wave-bar:nth-child(2) { animation-delay: 0.1s; height: 25px; }
+    .voice-wave-bar:nth-child(3) { animation-delay: 0.2s; height: 35px; }
+    .voice-wave-bar:nth-child(4) { animation-delay: 0.3s; height: 28px; }
+    .voice-wave-bar:nth-child(5) { animation-delay: 0.4s; height: 20px; }
+    .voice-wave-bar:nth-child(6) { animation-delay: 0.5s; height: 32px; }
+    .voice-wave-bar:nth-child(7) { animation-delay: 0.6s; height: 18px; }
+    @@keyframes wave-anim {
+        0%, 100% { transform: scaleY(1); opacity: 1; }
+        50% { transform: scaleY(0.4); opacity: 0.6; }
+    }
+
+    /* CONFIRMATION CARD */
+    .voice-confirm-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        margin-bottom: 25px;
+        display: none;
+        border-left: 5px solid #7c3aed;
+    }
+    .voice-confirm-card.show { display: block; }
+    .voice-confirm-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #0f172a;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .voice-confirm-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .voice-confirm-item {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 1px solid #e2e8f0;
+    }
+    .voice-confirm-label {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .voice-confirm-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: #0f172a;
+    }
+    .voice-confirm-value.error-val { color: #dc2626; }
+
+    .voice-confirm-btns {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .voice-confirm-save {
+        background: linear-gradient(135deg, #7c3aed, #2563eb);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .voice-confirm-save:hover { transform: translateY(-2px); opacity: 0.9; }
+    .voice-confirm-cancel {
+        background: white;
+        color: #64748b;
+        border: 1px solid #cbd5e1;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    .voice-confirm-cancel:hover { background: #f1f5f9; }
+
+    /* ERROR BOX */
+    .voice-error-box {
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 14px;
+        color: #991b1b;
+        display: none;
+        margin-top: 15px;
+        text-align: left;
+    }
+    .voice-error-box.show { display: block; }
+
+    /* SUCCESS BOX */
+    .voice-success-box {
+        background: #dcfce7;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 14px;
+        color: #166534;
+        display: none;
+        margin-top: 15px;
+        text-align: left;
+    }
+    .voice-success-box.show { display: block; }
+</style>
+
+<div class="voice-wrapper">
+
+    <h1 class="voice-page-title">
+        <i class="fa-solid fa-microphone"></i> Voice Task Creator
+    </h1>
+    <p class="voice-page-subtitle">Create tasks and assign them to employees using your voice.</p>
+
+    <!-- MIC CARD -->
+    <div class="voice-mic-card">
+
+        <div class="voice-instruction">
+            <i class="fa-solid fa-circle-info"></i>
+            <strong>How to use:</strong> Click the mic button and say something like:<br>
+            <em>"Create a task called Login Page with High priority and assign it to John with start date 10th June and due date 20th June"</em>
+        </div>
+
+        <button class="voice-mic-btn" id="micBtn" onclick="ToggleMic()">
+            <i class="fa-solid fa-microphone" id="micIcon"></i>
+        </button>
+
+        <div class="voice-status" id="voiceStatus">Click mic to start</div>
+        <div class="voice-status-sub" id="voiceStatusSub">Press the microphone button and speak clearly</div>
+
+        <!-- SOUND WAVES -->
+        <div class="voice-waves" id="voiceWaves">
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+            <div class="voice-wave-bar"></div>
+        </div>
+
+        <!-- TRANSCRIPT -->
+        <div class="voice-transcript-box" id="voiceTranscript">
+            <div class="voice-transcript-label"><i class="fa-solid fa-quote-left" style="margin-right:4px;"></i> You said:</div>
+            <span id="voiceTranscriptText"></span>
+        </div>
+
+        <!-- ERROR / SUCCESS -->
+        <div class="voice-error-box" id="voiceErrorBox">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right:8px;"></i>
+            <span id="voiceErrorText"></span>
+        </div>
+        <div class="voice-success-box" id="voiceSuccessBox">
+            <i class="fa-solid fa-circle-check" style="margin-right:8px;"></i>
+            <span id="voiceSuccessText"></span>
+        </div>
+
+    </div>
+
+    <!-- CONFIRMATION CARD -->
+    <div class="voice-confirm-card" id="voiceConfirmCard">
+        <div class="voice-confirm-title">
+            <i class="fa-solid fa-clipboard-check" style="color:#7c3aed;"></i>
+            Confirm Task Details
+        </div>
+        <div class="voice-confirm-grid">
+            <div class="voice-confirm-item">
+                <div class="voice-confirm-label"><i class="fa-solid fa-heading" style="margin-right:5px;"></i>Task Title</div>
+                <div class="voice-confirm-value" id="confirmTitle">-</div>
+            </div>
+            <div class="voice-confirm-item">
+                <div class="voice-confirm-label"><i class="fa-solid fa-flag" style="margin-right:5px;"></i>Priority</div>
+                <div class="voice-confirm-value" id="confirmPriority">-</div>
+            </div>
+            <div class="voice-confirm-item">
+                <div class="voice-confirm-label"><i class="fa-solid fa-user" style="margin-right:5px;"></i>Assign To</div>
+                <div class="voice-confirm-value" id="confirmEmployee">-</div>
+            </div>
+            <div class="voice-confirm-item">
+                <div class="voice-confirm-label"><i class="fa-solid fa-calendar-days" style="margin-right:5px;"></i>Start Date</div>
+                <div class="voice-confirm-value" id="confirmStartDate">-</div>
+            </div>
+            <div class="voice-confirm-item">
+                <div class="voice-confirm-label"><i class="fa-solid fa-calendar-check" style="margin-right:5px;"></i>Due Date</div>
+                <div class="voice-confirm-value" id="confirmDueDate">-</div>
+            </div>
+            <div class="voice-confirm-item">
+                <div class="voice-confirm-label"><i class="fa-solid fa-calendar-plus" style="margin-right:5px;"></i>Assigned Date</div>
+                <div class="voice-confirm-value" id="confirmAssignDate">Today</div>
+            </div>
+        </div>
+        <div class="voice-confirm-btns">
+            <button class="voice-confirm-save" onclick="SaveVoiceTask()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Task & Assignment
+            </button>
+            <button class="voice-confirm-cancel" onclick="CancelVoiceTask()">
+                <i class="fa-solid fa-xmark"></i> Cancel
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var recognition = null;
+    var isListening = false;
+    var employeeList = [];
+    var parsedTask = {};
+
+    // Load employees on page load
+    $(document).ready(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/GetEmployeeList',
+            dataType: 'json',
+            success: function (data) {
+                if (data != null && data.GetList != null) {
+                    employeeList = data.GetList;
+                }
+            }
+        });
+    });
+
+    function ToggleMic() {
+        if (isListening) {
+            StopListening();
+        } else {
+            StartListening();
+        }
+    }
+
+    function StartListening() {
+        // Reset UI
+        HideAll();
+
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            ShowError('Your browser does not support voice recognition. Please use Google Chrome.');
+            return;
+        }
+
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        recognition.continuous = false;
+
+        recognition.onstart = function () {
+            isListening = true;
+            SetListeningUI();
+        };
+
+        recognition.onresult = function (event) {
+            var transcript = '';
+            for (var i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            document.getElementById('voiceTranscriptText').innerText = transcript;
+            document.getElementById('voiceTranscript').classList.add('show');
+        };
+
+        recognition.onend = function () {
+            isListening = false;
+            var transcript = document.getElementById('voiceTranscriptText').innerText.trim();
+            if (transcript !== '') {
+                SetProcessingUI();
+                setTimeout(function () {
+                    ProcessVoiceCommand(transcript);
+                }, 800);
+            } else {
+                ResetMicUI();
+                ShowError('No speech detected. Please try again.');
+            }
+        };
+
+        recognition.onerror = function (event) {
+            isListening = false;
+            ResetMicUI();
+            if (event.error === 'not-allowed') {
+                ShowError('Microphone access denied. Please allow microphone permission in your browser settings.');
+            } else if (event.error === 'no-speech') {
+                ShowError('No speech detected. Please try again.');
+            } else {
+                ShowError('Voice recognition error: ' + event.error);
+            }
+        };
+
+        recognition.start();
+    }
+
+    function StopListening() {
+        if (recognition) {
+            recognition.stop();
+        }
+        isListening = false;
+        ResetMicUI();
+    }
+
+    function SetListeningUI() {
+        var btn = document.getElementById('micBtn');
+        var icon = document.getElementById('micIcon');
+        var status = document.getElementById('voiceStatus');
+        var sub = document.getElementById('voiceStatusSub');
+        var waves = document.getElementById('voiceWaves');
+
+        btn.classList.add('listening');
+        btn.classList.remove('processing');
+        icon.className = 'fa-solid fa-stop';
+        status.className = 'voice-status listening';
+        status.innerText = 'Listening...';
+        sub.innerText = 'Speak clearly — click stop when done';
+        waves.classList.add('show');
+    }
+
+    function SetProcessingUI() {
+        var btn = document.getElementById('micBtn');
+        var icon = document.getElementById('micIcon');
+        var status = document.getElementById('voiceStatus');
+        var sub = document.getElementById('voiceStatusSub');
+        var waves = document.getElementById('voiceWaves');
+
+        btn.classList.remove('listening');
+        btn.classList.add('processing');
+        icon.className = 'fa-solid fa-spinner fa-spin';
+        status.className = 'voice-status processing';
+        status.innerText = 'Processing...';
+        sub.innerText = 'Analyzing your voice command';
+        waves.classList.remove('show');
+    }
+
+    function ResetMicUI() {
+        var btn = document.getElementById('micBtn');
+        var icon = document.getElementById('micIcon');
+        var status = document.getElementById('voiceStatus');
+        var sub = document.getElementById('voiceStatusSub');
+        var waves = document.getElementById('voiceWaves');
+
+        btn.classList.remove('listening', 'processing');
+        icon.className = 'fa-solid fa-microphone';
+        status.className = 'voice-status';
+        status.innerText = 'Click mic to start';
+        sub.innerText = 'Press the microphone button and speak clearly';
+        waves.classList.remove('show');
+    }
+
+    function ProcessVoiceCommand(transcript) {
+        ResetMicUI();
+
+        var lower = transcript.toLowerCase();
+        console.log('Transcript:', transcript); // for debugging
+
+        // --- EXTRACT TASK TITLE ---
+        var taskTitle = '';
+        var titlePatterns = [
+            /create a task called (.+?) with/i,
+            /create a task called (.+?) and/i,
+            /create a task named (.+?) with/i,
+            /create a task named (.+?) and/i,
+            /create task called (.+?) with/i,
+            /create task called (.+?) and/i,
+            /task called (.+?) with/i,
+            /task called (.+?) and/i,
+            /task named (.+?) with/i,
+            /task named (.+?) and/i,
+            /called (.+?) with/i,
+            /called (.+?) high/i,
+            /called (.+?) medium/i,
+            /called (.+?) low/i,
+            /called (.+?) priority/i,
+            /called (.+?) assign/i,
+            /called (.+?) start/i,
+            /called (.+?) due/i,
+            /create a task called (.+)/i,
+            /create task called (.+)/i,
+            /task called (.+)/i,
+            /task named (.+)/i,
+            /called (.+)/i
+        ];
+
+        for (var i = 0; i < titlePatterns.length; i++) {
+            var match = transcript.match(titlePatterns[i]);
+            if (match) {
+                taskTitle = match[1].trim();
+                // Clean up — remove trailing words like "with high priority"
+                taskTitle = taskTitle
+                    .replace(/\s+(with|and|assign|start|due|high|medium|low|priority).*$/i, '')
+                    .trim();
+                break;
+            }
+        }
+
+        // If still no title found, try to extract anything after "called" or "named"
+        if (taskTitle === '') {
+            var simpleMatch = lower.match(/called\s+(.+)/i) || lower.match(/named\s+(.+)/i);
+            if (simpleMatch) {
+                taskTitle = simpleMatch[1].trim()
+                    .replace(/\s+(with|and|assign|start|due|high|medium|low|priority).*$/i, '')
+                    .trim();
+            }
+        }
+
+        // --- EXTRACT PRIORITY ---
+        var priority = 'Medium';
+        if (/\bhigh\b/i.test(lower)) priority = 'High';
+        else if (/\blow\b/i.test(lower)) priority = 'Low';
+        else if (/\bmedium\b/i.test(lower)) priority = 'Medium';
+
+        // --- EXTRACT EMPLOYEE NAME ---
+        var empName = '';
+        var empPatterns = [
+            /assign it to (.+?) with/i,
+            /assign it to (.+?) start/i,
+            /assign it to (.+?) due/i,
+            /assign it to (.+?) and/i,
+            /assign it to (.+?)$/i,
+            /assign to (.+?) with/i,
+            /assign to (.+?) start/i,
+            /assign to (.+?) due/i,
+            /assign to (.+?) and/i,
+            /assign to (.+?)$/i,
+            /assigned to (.+?) with/i,
+            /assigned to (.+?) start/i,
+            /assigned to (.+?) due/i,
+            /assigned to (.+?)$/i,
+            /give it to (.+?) with/i,
+            /give it to (.+?)$/i,
+            /give to (.+?)$/i
+        ];
+        for (var j = 0; j < empPatterns.length; j++) {
+            var empMatch = transcript.match(empPatterns[j]);
+            if (empMatch) {
+                empName = empMatch[1].trim()
+                    .replace(/\s+(with|and|start|due|high|medium|low|priority).*$/i, '')
+                    .trim();
+                break;
+            }
+        }
+
+        // --- FIND EMPLOYEE IN LIST ---
+        var foundEmployee = null;
+        if (empName !== '') {
+            var empNameLower = empName.toLowerCase();
+            for (var k = 0; k < employeeList.length; k++) {
+                var listName = employeeList[k].empname.toLowerCase();
+                if (listName.indexOf(empNameLower) !== -1 ||
+                    empNameLower.indexOf(listName) !== -1) {
+                    foundEmployee = employeeList[k];
+                    break;
+                }
+            }
+        }
+
+        // --- EXTRACT DATES ---
+        var today = new Date();
+        var startDate = '';
+        var dueDate = '';
+
+        var startPatterns = [
+            /start(?:ing)?(?:\s+date)?(?:\s+is)?\s+(?:from\s+)?(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /start(?:ing)?(?:\s+date)?(?:\s+is)?\s+(?:from\s+)?((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?)/i,
+            /start(?:ing)?(?:\s+date)?(?:\s+is)?\s+(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/i,
+            /from\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /from\s+((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?)/i,
+            /starts?\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /starts?\s+((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?)/i,
+            /a\s+start\s+date\s+of\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /a\s+start\s+date\s+of\s+((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?)/i
+        ];
+        for (var s = 0; s < startPatterns.length; s++) {
+            var sm = transcript.match(startPatterns[s]);
+            if (sm) { startDate = parseSpokenDate(sm[1], today.getFullYear()); break; }
+        }
+
+        var duePatterns = [
+            /due(?:\s+date)?(?:\s+is)?\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /due(?:\s+date)?(?:\s+is)?\s+((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?)/i,
+            /due(?:\s+date)?(?:\s+is)?\s+(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/i,
+            /deadline\s+(?:is\s+)?(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /deadline\s+(?:is\s+)?((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?)/i,
+            /end(?:s|ing)?(?:\s+date)?(?:\s+is)?\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /a\s+due\s+date\s+of\s+(\d{1,2}(?:st|nd|rd|th)?\s+(?:january|february|march|april|may|june|july|august|september|october|november|december))/i,
+            /a\s+due\s+date\s+of\s+((?:january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}(?:st|nd|rd|th)?)/i
+        ];
+        for (var d = 0; d < duePatterns.length; d++) {
+            var dm = transcript.match(duePatterns[d]);
+            if (dm) { dueDate = parseSpokenDate(dm[1], today.getFullYear()); break; }
+        }
+
+        if (startDate === '') startDate = formatDateToInput(today);
+        if (dueDate === '') {
+            var nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+            dueDate = formatDateToInput(nextWeek);
+        }
+
+        // --- VALIDATE ---
+        if (taskTitle === '') {
+            // Show what was heard to help user
+            ShowError('Could not detect task title from: "' + transcript + '"\n\nPlease say: "Create a task called Login Page with High priority and assign it to John"');
+            return;
+        }
+
+        // --- STORE PARSED TASK ---
+        parsedTask = {
+            title: taskTitle,
+            priority: priority,
+            empName: empName,
+            foundEmployee: foundEmployee,
+            startDate: startDate,
+            dueDate: dueDate,
+            assignDate: formatDateToInput(today)
+        };
+
+        // --- SHOW CONFIRMATION ---
+        document.getElementById('confirmTitle').innerText = taskTitle;
+        document.getElementById('confirmPriority').innerText = priority;
+
+        var empEl = document.getElementById('confirmEmployee');
+        if (empName === '') {
+            empEl.innerText = 'Not specified';
+            empEl.className = 'voice-confirm-value';
+        } else if (foundEmployee) {
+            empEl.innerText = foundEmployee.empname;
+            empEl.className = 'voice-confirm-value';
+        } else {
+            empEl.innerText = '"' + empName + '" — NOT FOUND in organization';
+            empEl.className = 'voice-confirm-value error-val';
+        }
+
+        document.getElementById('confirmStartDate').innerText = startDate;
+        document.getElementById('confirmDueDate').innerText = dueDate;
+        document.getElementById('confirmAssignDate').innerText = formatDateToInput(today) + ' (Today)';
+        document.getElementById('voiceConfirmCard').classList.add('show');
+    }
+
+    function parseSpokenDate(str, year) {
+        var months = {
+            'january': '01', 'february': '02', 'march': '03', 'april': '04',
+            'may': '05', 'june': '06', 'july': '07', 'august': '08',
+            'september': '09', 'october': '10', 'november': '11', 'december': '12'
+        };
+
+        // Handle "10th June" or "10 June" OR "June 10th" or "June 10"
+        var match1 = str.match(/(\d{1,2})(?:st|nd|rd|th)?\s+(january|february|march|april|may|june|july|august|september|october|november|december)/i);
+        var match2 = str.match(/(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})(?:st|nd|rd|th)?/i);
+
+        if (match1) {
+            var day = match1[1].padStart(2, '0');
+            var month = months[match1[2].toLowerCase()];
+            return year + '-' + month + '-' + day;
+        }
+        if (match2) {
+            var day = match2[2].padStart(2, '0');
+            var month = months[match2[1].toLowerCase()];
+            return year + '-' + month + '-' + day;
+        }
+
+        // Handle "10/06/2026" or "10-06-2026"
+        var slashMatch = str.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/);
+        if (slashMatch) {
+            var d2 = slashMatch[1].padStart(2, '0');
+            var m2 = slashMatch[2].padStart(2, '0');
+            var y2 = slashMatch[3].length === 2 ? '20' + slashMatch[3] : slashMatch[3];
+            return y2 + '-' + m2 + '-' + d2;
+        }
+
+        return '';
+    }
+
+    function formatDateToInput(date) {
+        // If it's already a string in YYYY-MM-DD format, return as is
+        if (typeof date === 'string' && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            return date;
+        }
+        // If it's a Date object
+        if (date instanceof Date) {
+            var y = date.getFullYear();
+            var m = String(date.getMonth() + 1).padStart(2, '0');
+            var d = String(date.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + d;
+        }
+        return '';
+    }
+
+    function SaveVoiceTask() {
+        if (!parsedTask.title) return;
+
+        // Check employee
+        if (parsedTask.empName !== '' && !parsedTask.foundEmployee) {
+            ShowError('"' + parsedTask.empName + '" is not found in the organization. Please add this employee first or try again with a different name.');
+            return;
+        }
+
+        // Generate description using same logic as taskcreation.js
+        var description = generateDescription(parsedTask.title);
+
+        var taskDetails = {
+            tasktitle: parsedTask.title,
+            priority: parsedTask.priority,
+            description: description,
+            startdate: parsedTask.startDate,
+            duedate: parsedTask.dueDate
+        };
+
+        // Step 1 — Save Task
+        $.ajax({
+            type: 'POST',
+            url: '/Home/SaveTask',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(taskDetails),
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    // Step 2 — If employee specified, assign task
+                    if (parsedTask.foundEmployee) {
+                        // Get latest task list to find the new task ID
+                        $.ajax({
+                            type: 'GET',
+                            url: '/Home/GetTaskList',
+                            dataType: 'json',
+                            success: function (data) {
+                                var newTaskId = null;
+                                if (data != null && data.GetList != null) {
+                                    // Find the task we just created by title
+                                    for (var i = 0; i < data.GetList.length; i++) {
+                                        if (data.GetList[i].tasktitle.toLowerCase() === parsedTask.title.toLowerCase()) {
+                                            newTaskId = data.GetList[i].taskid;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (newTaskId) {
+                                    var assignDetails = {
+                                        empid: parsedTask.foundEmployee.empid,
+                                        taskid: newTaskId,
+                                        assigneddate: parsedTask.assignDate
+                                    };
+
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/Home/SaveTaskAssign',
+                                        contentType: 'application/json; charset=utf-8',
+                                        data: JSON.stringify(assignDetails),
+                                        dataType: 'json',
+                                        success: function (assignResponse) {
+                                            document.getElementById('voiceConfirmCard').classList.remove('show');
+                                            ShowSuccess('Task "' + parsedTask.title + '" created and assigned to ' + parsedTask.foundEmployee.empname + ' successfully!');
+                                            ResetAll();
+                                        },
+                                        error: function () {
+                                            ShowError('Task saved but assignment failed. Please assign manually.');
+                                        }
+                                    });
+                                } else {
+                                    document.getElementById('voiceConfirmCard').classList.remove('show');
+                                    ShowSuccess('Task "' + parsedTask.title + '" created successfully! (Assignment skipped — task not found)');
+                                    ResetAll();
+                                }
+                            }
+                        });
+                    } else {
+                        document.getElementById('voiceConfirmCard').classList.remove('show');
+                        ShowSuccess('Task "' + parsedTask.title + '" created successfully!');
+                        ResetAll();
+                    }
+                } else {
+                    ShowError('Failed to save task: ' + response.message);
+                }
+            },
+            error: function () {
+                ShowError('Error saving task. Please try again.');
+            }
+        });
+    }
+
+    function CancelVoiceTask() {
+        document.getElementById('voiceConfirmCard').classList.remove('show');
+        parsedTask = {};
+        ResetMicUI();
+    }
+
+    function HideAll() {
+        document.getElementById('voiceErrorBox').classList.remove('show');
+        document.getElementById('voiceSuccessBox').classList.remove('show');
+        document.getElementById('voiceTranscript').classList.remove('show');
+        document.getElementById('voiceConfirmCard').classList.remove('show');
+    }
+
+    function ShowError(msg) {
+        document.getElementById('voiceErrorText').innerText = msg;
+        document.getElementById('voiceErrorBox').classList.add('show');
+        document.getElementById('voiceSuccessBox').classList.remove('show');
+    }
+
+    function ShowSuccess(msg) {
+        document.getElementById('voiceSuccessText').innerText = msg;
+        document.getElementById('voiceSuccessBox').classList.add('show');
+        document.getElementById('voiceErrorBox').classList.remove('show');
+    }
+
+    function ResetAll() {
+        parsedTask = {};
+        setTimeout(function () {
+            document.getElementById('voiceTranscriptText').innerText = '';
+            document.getElementById('voiceTranscript').classList.remove('show');
+        }, 3000);
+    }
+
+    // Same generateDescription function from taskcreation.js
+    function generateDescription(title) {
+        var t = title.toLowerCase();
+        if (t.includes('login') || t.includes('sign in')) return 'Design and develop the ' + title + ' with username/email and password fields, input validation and secure authentication.';
+        if (t.includes('signup') || t.includes('register')) return 'Build the ' + title + ' with form fields for full name, username, email, password and phone number with validation.';
+        if (t.includes('dashboard')) return 'Create the ' + title + ' with summary cards showing total, pending, completed and overdue tasks.';
+        if (t.includes('task')) return 'Design and develop the ' + title + ' module with complete CRUD operations including add, edit and delete.';
+        if (t.includes('employee')) return 'Build the ' + title + ' module to manage employee records including name, email, mobile and role.';
+        if (t.includes('report')) return 'Develop the ' + title + ' page with summary cards, charts and detailed data tables for all modules.';
+        if (t.includes('calendar')) return 'Develop the ' + title + ' feature to display tasks and deadlines in a monthly or weekly view.';
+        if (t.includes('progress')) return 'Implement the ' + title + ' module to update task status as Pending, In Progress or Completed.';
+        return 'Design and develop the ' + title + ' with all required features, proper validation and user-friendly interface.';
+    }
+</script>

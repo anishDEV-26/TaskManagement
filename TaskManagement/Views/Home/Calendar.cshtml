@@ -1,0 +1,858 @@
+﻿@{
+    ViewBag.Title = "Calendar";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    @@keyframes fadeSlideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-16px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes popIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%,-50%) scale(0.85);
+        }
+
+        to {
+            opacity: 1;
+            transform: translate(-50%,-50%) scale(1);
+        }
+    }
+
+    @@keyframes dayFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @@keyframes pulseDot {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.3);
+        }
+    }
+
+    /* PAGE HEADER */
+    .cal-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .cal-page-title {
+        font-size: 30px;
+        font-weight: 800;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+    }
+
+    .cal-page-title-icon {
+        width: 52px;
+        height: 52px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+        box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+    }
+
+    .cal-page-subtitle {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-top: 3px;
+    }
+
+    /* TOP BAR */
+    .cal-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .cal-nav-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: white;
+        padding: 8px 16px;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+        border: 1px solid #e2e8f0;
+    }
+
+    .cal-nav-btn {
+        width: 36px;
+        height: 36px;
+        background: #f1f5f9;
+        border: none;
+        border-radius: 9px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #334155;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .cal-nav-btn:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+
+    .cal-month-label {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+        min-width: 190px;
+        text-align: center;
+        letter-spacing: -0.3px;
+    }
+
+    .cal-today-btn {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+
+        .cal-today-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(37,99,235,0.4);
+        }
+
+    /* LEGEND */
+    .cal-legend {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 12.5px;
+        color: #64748b;
+        background: white;
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        flex-wrap: wrap;
+    }
+
+    .cal-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-weight: 500;
+    }
+
+    .cal-legend-dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 4px;
+        flex-shrink: 0;
+    }
+
+    /* MAIN CARD */
+    .cal-card {
+        background: white;
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        border: 1px solid #f1f5f9;
+    }
+
+    /* DAY HEADERS */
+    .cal-day-headers {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        margin-bottom: 10px;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 4px 0;
+    }
+
+    .cal-day-header {
+        text-align: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #94a3b8;
+        padding: 10px 0;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+    }
+
+        .cal-day-header:first-child {
+            color: #f87171;
+        }
+
+        .cal-day-header:last-child {
+            color: #60a5fa;
+        }
+
+    /* DAYS GRID */
+    .cal-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+    }
+
+    /* DAY CELL */
+    .cal-day {
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        font-size: 15px;
+        color: #334155;
+        cursor: default;
+        position: relative;
+        transition: all 0.2s ease;
+        background: #f8fafc;
+        font-weight: 500;
+        animation: dayFadeIn 0.35s ease forwards;
+        border: 1.5px solid transparent;
+    }
+
+        .cal-day:hover:not(.other-month) {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            transform: scale(1.05);
+        }
+
+        .cal-day.other-month {
+            background: transparent;
+            color: #e2e8f0;
+        }
+
+        .cal-day.today {
+            background: #eff6ff;
+            border: 2px solid #2563eb;
+            color: #2563eb;
+            font-weight: 800;
+        }
+
+        .cal-day.has-task {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+        }
+
+            .cal-day.has-task:hover {
+                background: linear-gradient(135deg, #1d4ed8, #2563eb);
+                transform: scale(1.08) translateY(-2px);
+                box-shadow: 0 8px 22px rgba(37,99,235,0.45);
+            }
+
+        .cal-day.today.has-task {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            border: 2.5px solid #93c5fd;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.15), 0 6px 18px rgba(37,99,235,0.4);
+        }
+        /* Sunday col */
+        .cal-day.sunday:not(.has-task):not(.other-month) {
+            color: #f87171;
+        }
+        /* Saturday col */
+        .cal-day.saturday:not(.has-task):not(.other-month) {
+            color: #60a5fa;
+        }
+
+    /* BADGE */
+    .cal-task-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 18px;
+        height: 18px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        border-radius: 50%;
+        font-size: 9px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        box-shadow: 0 2px 6px rgba(245,158,11,0.5);
+        animation: pulseDot 2s ease infinite;
+        border: 1.5px solid white;
+    }
+
+    /* TASK DOT under date number */
+    .cal-task-dot {
+        width: 5px;
+        height: 5px;
+        background: rgba(255,255,255,0.7);
+        border-radius: 50%;
+        margin-top: 4px;
+    }
+
+    .cal-day-empty {
+        aspect-ratio: 1;
+    }
+
+    /* POPUP OVERLAY */
+    .cal-popup-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.5);
+        backdrop-filter: blur(4px);
+        z-index: 99999;
+        display: none;
+    }
+
+        .cal-popup-overlay.show {
+            display: block;
+        }
+
+    /* POPUP */
+    .cal-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%) scale(0.85);
+        background: white;
+        border-radius: 22px;
+        width: 420px;
+        max-height: 540px;
+        z-index: 100000;
+        display: none;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+        overflow: hidden;
+    }
+
+        .cal-popup.show {
+            display: block;
+            animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+        }
+
+    .cal-popup-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+        padding: 22px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cal-popup-header::before {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            top: -60px;
+            right: -40px;
+        }
+
+        .cal-popup-header::after {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+            bottom: -30px;
+            left: 30px;
+        }
+
+    .cal-popup-header-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cal-popup-header-icon {
+        width: 46px;
+        height: 46px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .cal-popup-title {
+        color: white;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .cal-popup-date-label {
+        color: rgba(255,255,255,0.65);
+        font-size: 13px;
+        margin-top: 2px;
+    }
+
+    .cal-popup-close {
+        width: 36px;
+        height: 36px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 15px;
+        transition: 0.2s;
+        position: relative;
+        z-index: 1;
+    }
+
+        .cal-popup-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+    .cal-popup-body {
+        padding: 20px 22px;
+        overflow-y: auto;
+        max-height: 400px;
+    }
+
+    .cal-popup-count {
+        font-size: 12.5px;
+        color: #64748b;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: #f8fafc;
+        padding: 8px 12px;
+        border-radius: 9px;
+        font-weight: 500;
+    }
+
+    .cal-task-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 14px 16px;
+        background: #f8fafc;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border-left: 4px solid #2563eb;
+        transition: 0.2s;
+        cursor: default;
+    }
+
+        .cal-task-item:hover {
+            background: #eff6ff;
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.1);
+        }
+
+    .cal-task-item-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(37,99,235,0.12);
+    }
+
+    .cal-task-item-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .cal-task-item-emp {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .cal-task-item-emp-badge {
+        background: #eff6ff;
+        color: #2563eb;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    /* MINI STATS BAR */
+    .cal-stats-bar {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+
+    .cal-stat-pill {
+        flex: 1;
+        min-width: 120px;
+        background: white;
+        border-radius: 14px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        animation: fadeSlideDown 0.5s ease forwards;
+    }
+
+        .cal-stat-pill:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .cal-stat-pill:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+    .cal-stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .cal-stat-val {
+        font-size: 22px;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1;
+    }
+
+    .cal-stat-lbl {
+        font-size: 11.5px;
+        color: #94a3b8;
+        font-weight: 500;
+        margin-top: 2px;
+    }
+
+    @@media(max-width: 700px) {
+        .cal-popup {
+            width: 95vw;
+        }
+
+        .cal-day {
+            font-size: 13px;
+            border-radius: 10px;
+        }
+
+        .cal-card {
+            padding: 16px;
+        }
+
+        .cal-stats-bar {
+            gap: 8px;
+        }
+    }
+</style>
+
+<div class="cal-page-header">
+    <div style="display:flex;align-items:center;gap:14px;">
+        <div class="cal-page-title-icon">
+            <i class="fa-solid fa-calendar-days"></i>
+        </div>
+        <div>
+            <div class="cal-page-title">Task Calendar</div>
+            <div class="cal-page-subtitle">View and track all assigned tasks by date</div>
+        </div>
+    </div>
+</div>
+
+<!-- MINI STATS -->
+<div class="cal-stats-bar" id="calStatsBar">
+    <div class="cal-stat-pill">
+        <div class="cal-stat-icon" style="background:#eff6ff;">
+            <i class="fa-solid fa-calendar-check" style="color:#2563eb;"></i>
+        </div>
+        <div>
+            <div class="cal-stat-val" id="statTotalAssign">—</div>
+            <div class="cal-stat-lbl">Total Assignments</div>
+        </div>
+    </div>
+    <div class="cal-stat-pill">
+        <div class="cal-stat-icon" style="background:#f0fdf4;">
+            <i class="fa-solid fa-calendar-day" style="color:#16a34a;"></i>
+        </div>
+        <div>
+            <div class="cal-stat-val" id="statThisMonth">—</div>
+            <div class="cal-stat-lbl">This Month</div>
+        </div>
+    </div>
+    <div class="cal-stat-pill">
+        <div class="cal-stat-icon" style="background:#fff7ed;">
+            <i class="fa-solid fa-users" style="color:#ea580c;"></i>
+        </div>
+        <div>
+            <div class="cal-stat-val" id="statActiveDays">—</div>
+            <div class="cal-stat-lbl">Active Days</div>
+        </div>
+    </div>
+</div>
+
+<div class="cal-top-bar">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="cal-nav-wrap">
+            <button class="cal-nav-btn" onclick="CalPrevMonth()">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="cal-month-label" id="calMonthLabel"></div>
+            <button class="cal-nav-btn" onclick="CalNextMonth()">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        <button class="cal-today-btn" onclick="CalGoToday()">
+            <i class="fa-solid fa-crosshairs" style="margin-right:6px;"></i>Today
+        </button>
+    </div>
+    <div class="cal-legend">
+        <div class="cal-legend-item">
+            <div class="cal-legend-dot" style="background:linear-gradient(135deg,#2563eb,#3b82f6);"></div>
+            Has tasks
+        </div>
+        <div class="cal-legend-item">
+            <div class="cal-legend-dot" style="background:#eff6ff;border:2px solid #2563eb;"></div>
+            Today
+        </div>
+        <div class="cal-legend-item">
+            <div class="cal-legend-dot" style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:50%;"></div>
+            Multiple tasks
+        </div>
+    </div>
+</div>
+
+<div class="cal-card">
+    <div class="cal-day-headers">
+        <div class="cal-day-header">Sun</div>
+        <div class="cal-day-header">Mon</div>
+        <div class="cal-day-header">Tue</div>
+        <div class="cal-day-header">Wed</div>
+        <div class="cal-day-header">Thu</div>
+        <div class="cal-day-header">Fri</div>
+        <div class="cal-day-header">Sat</div>
+    </div>
+    <div class="cal-days" id="calDays"></div>
+</div>
+
+<!-- POPUP OVERLAY -->
+<div class="cal-popup-overlay" id="calPopupOverlay" onclick="CloseTaskPopup()"></div>
+
+<!-- TASK POPUP -->
+<div class="cal-popup" id="calPopup">
+    <div class="cal-popup-header">
+        <div class="cal-popup-header-left">
+            <div class="cal-popup-header-icon">
+                <i class="fa-solid fa-calendar-check" style="color:white;font-size:18px;"></i>
+            </div>
+            <div>
+                <div class="cal-popup-title">Assigned Tasks</div>
+                <div class="cal-popup-date-label" id="calPopupDate"></div>
+            </div>
+        </div>
+        <button class="cal-popup-close" onclick="CloseTaskPopup()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <div class="cal-popup-body">
+        <div class="cal-popup-count" id="calPopupCount"></div>
+        <div id="calPopupList"></div>
+    </div>
+</div>
+
+<script>
+    var calData = [];
+    var calCurrentYear = new Date().getFullYear();
+    var calCurrentMonth = new Date().getMonth();
+    var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    $(document).ready(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/Home/GetCalendarAssignments',
+            dataType: 'json',
+            success: function (data) {
+                calData = data || [];
+                RenderCalendar();
+                UpdateStats();
+            },
+            error: function () { alert('Error loading calendar data.'); }
+        });
+    });
+
+    function CalPrevMonth() {
+        calCurrentMonth--;
+        if (calCurrentMonth < 0) { calCurrentMonth = 11; calCurrentYear--; }
+        RenderCalendar();
+        UpdateStats();
+    }
+
+    function CalNextMonth() {
+        calCurrentMonth++;
+        if (calCurrentMonth > 11) { calCurrentMonth = 0; calCurrentYear++; }
+        RenderCalendar();
+        UpdateStats();
+    }
+
+    function CalGoToday() {
+        calCurrentYear = new Date().getFullYear();
+        calCurrentMonth = new Date().getMonth();
+        RenderCalendar();
+        UpdateStats();
+    }
+
+    function BuildTaskMap() {
+        var taskMap = {};
+        calData.forEach(function (item) {
+            if (!item.assigneddate) return;
+            var ts = parseInt(item.assigneddate.replace('/Date(', '').replace(')/', ''));
+            var d = new Date(ts);
+            var key = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            if (!taskMap[key]) taskMap[key] = [];
+            taskMap[key].push(item);
+        });
+        return taskMap;
+    }
+
+    function UpdateStats() {
+        var taskMap = BuildTaskMap();
+        document.getElementById('statTotalAssign').textContent = calData.length;
+
+        var monthCount = 0;
+        var activeDays = 0;
+        Object.keys(taskMap).forEach(function (key) {
+            var parts = key.split('-');
+            if (parseInt(parts[0]) === calCurrentYear && parseInt(parts[1]) === calCurrentMonth + 1) {
+                monthCount += taskMap[key].length;
+                activeDays++;
+            }
+        });
+        document.getElementById('statThisMonth').textContent = monthCount;
+        document.getElementById('statActiveDays').textContent = activeDays;
+    }
+
+    function RenderCalendar() {
+        document.getElementById('calMonthLabel').innerText = monthNames[calCurrentMonth] + ' ' + calCurrentYear;
+        var today = new Date();
+        var firstDay = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
+        var daysInMonth = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
+        var taskMap = BuildTaskMap();
+
+        var html = '';
+        for (var i = 0; i < firstDay; i++) {
+            html += '<div class="cal-day-empty"></div>';
+        }
+        for (var day = 1; day <= daysInMonth; day++) {
+            var key = calCurrentYear + '-' + (calCurrentMonth + 1) + '-' + day;
+            var hasTask = taskMap[key] && taskMap[key].length > 0;
+            var isToday = (today.getFullYear() === calCurrentYear && today.getMonth() === calCurrentMonth && today.getDate() === day);
+            var dow = (firstDay + day - 1) % 7;
+            var classes = 'cal-day';
+            if (hasTask) classes += ' has-task';
+            if (isToday) classes += ' today';
+            if (dow === 0) classes += ' sunday';
+            if (dow === 6) classes += ' saturday';
+
+            var badge = '';
+            if (hasTask && taskMap[key].length > 1) {
+                badge = '<span class="cal-task-badge">' + taskMap[key].length + '</span>';
+            }
+            var dot = hasTask ? '<div class="cal-task-dot"></div>' : '';
+            var onclick = hasTask ? 'onclick="ShowTaskPopup(\'' + key + '\',' + day + ')"' : '';
+            var animDelay = 'style="animation-delay:' + ((day - 1) * 0.018) + 's;opacity:0;"';
+
+            html += '<div class="' + classes + '" ' + onclick + ' ' + animDelay + '>' + day + badge + dot + '</div>';
+        }
+        document.getElementById('calDays').innerHTML = html;
+    }
+
+    function ShowTaskPopup(key, day) {
+        var taskMap = BuildTaskMap();
+        var tasks = taskMap[key] || [];
+        var dateLabel = day + ' ' + monthNames[calCurrentMonth] + ' ' + calCurrentYear;
+        document.getElementById('calPopupDate').innerText = dateLabel;
+        document.getElementById('calPopupCount').innerHTML =
+            '<i class="fa-solid fa-circle-info" style="color:#2563eb;font-size:13px;"></i> ' +
+            '<strong>' + tasks.length + ' task' + (tasks.length > 1 ? 's' : '') + '</strong>&nbsp;assigned on this date';
+
+        var listHtml = '';
+        tasks.forEach(function (task, i) {
+            listHtml +=
+                '<div class="cal-task-item" style="animation-delay:' + (i * 0.07) + 's;">' +
+                '<div class="cal-task-item-icon">' +
+                '<i class="fa-solid fa-list-check" style="color:#2563eb;font-size:15px;"></i>' +
+                '</div>' +
+                '<div>' +
+                '<div class="cal-task-item-name">' + task.tasktitle + '</div>' +
+                '<div class="cal-task-item-emp">' +
+                '<i class="fa-solid fa-circle-user" style="color:#94a3b8;font-size:11px;"></i>' +
+                '<span class="cal-task-item-emp-badge">' + task.empname + '</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        });
+
+        document.getElementById('calPopupList').innerHTML = listHtml;
+        document.getElementById('calPopupOverlay').classList.add('show');
+        document.getElementById('calPopup').classList.add('show');
+    }
+
+    function CloseTaskPopup() {
+        document.getElementById('calPopupOverlay').classList.remove('show');
+        document.getElementById('calPopup').classList.remove('show');
+    }
+</script>

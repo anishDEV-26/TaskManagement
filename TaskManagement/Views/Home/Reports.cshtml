@@ -1,0 +1,484 @@
+﻿@{
+    ViewBag.Title = "Reports";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .report-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #1e293b;
+    }
+
+    .report-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .btn-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .report-btn {
+        border: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        transition: 0.3s;
+    }
+
+        .report-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-pdf {
+        background: #dc2626;
+    }
+
+    .btn-excel {
+        background: #16a34a;
+    }
+
+    .report-filter {
+        padding: 11px 18px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 15px;
+        outline: none;
+        cursor: pointer;
+        color: #334155;
+        background: white;
+    }
+
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .metric-icon {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    .metric-label {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .metric-value {
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .chart-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+
+    .legend-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+    }
+
+    .view-section {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .view-section-label {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .section-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .rtable {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .rtable th {
+            background: #f8fafc;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .rtable td {
+            padding: 10px 12px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .rtable tr:last-child td {
+            border-bottom: none;
+        }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .badge-high {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-medium {
+        background: #fef9c3;
+        color: #854d0e;
+    }
+
+    .badge-low {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .badge-completed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .prog-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .prog-bar {
+        background: #f1f5f9;
+        border-radius: 99px;
+        height: 6px;
+        width: 70px;
+    }
+
+    .prog-fill {
+        height: 6px;
+        border-radius: 99px;
+    }
+
+    .no-data {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 14px;
+        padding: 30px;
+    }
+</style>
+
+<div id="reportContent">
+
+    <div class="report-header">
+        <div>
+            <div class="report-title">
+                <i class="fa-solid fa-file-export"></i> Task Management Report
+            </div>
+            <div class="report-subtitle" id="reportDate"></div>
+        </div>
+        <div class="btn-row">
+            <button class="report-btn btn-pdf" onclick="ExportPDF()">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+            </button>
+            <button class="report-btn btn-excel" onclick="ExportExcel()">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
+            </button>
+        </div>
+    </div>
+
+    <!-- METRIC CARDS -->
+    <div class="metric-grid" id="sectionMetrics">
+        <div class="metric-card">
+            <div class="metric-icon" style="color:#2563eb;"><i class="fa-solid fa-list-check"></i></div>
+            <div class="metric-label">Total tasks</div>
+            <div class="metric-value" id="totalTasks" style="color:#2563eb;">0</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon" style="color:#d97706;"><i class="fa-solid fa-clock"></i></div>
+            <div class="metric-label">Pending tasks</div>
+            <div class="metric-value" id="pendingTasks" style="color:#d97706;">0</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon" style="color:#16a34a;"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="metric-label">Completed tasks</div>
+            <div class="metric-value" id="completedTasks" style="color:#16a34a;">0</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon" style="color:#dc2626;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="metric-label">Overdue tasks</div>
+            <div class="metric-value" id="overdueTasks" style="color:#dc2626;">0</div>
+        </div>
+    </div>
+
+    <!-- CHARTS - always visible -->
+    <div class="charts-grid" id="sectionCharts">
+        <div class="chart-card">
+            <div class="chart-title">Task progress status</div>
+            <div class="legend-row">
+                <span class="legend-item"><span class="legend-dot" style="background:#d97706;"></span>Pending</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#2563eb;"></span>In progress</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span>Completed</span>
+            </div>
+            <div style="position:relative;height:220px;">
+                <canvas id="statusChart" role="img" aria-label="Donut chart of task progress status">Task progress status chart</canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">Tasks by priority</div>
+            <div class="legend-row">
+                <span class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span>High</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#d97706;"></span>Medium</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span>Low</span>
+            </div>
+            <div style="position:relative;height:220px;">
+                <canvas id="priorityChart" role="img" aria-label="Bar chart of tasks by priority">Tasks by priority chart</canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">Employee task load</div>
+            <div class="legend-row">
+                <span class="legend-item"><span class="legend-dot" style="background:#2563eb;"></span>Assigned tasks</span>
+            </div>
+            <div style="position:relative;height:220px;">
+                <canvas id="empChart" role="img" aria-label="Horizontal bar chart of employee task load">Employee task load chart</canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">Progress percentage breakdown</div>
+            <div class="legend-row">
+                <span class="legend-item"><span class="legend-dot" style="background:#dc2626;"></span>0%</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#d97706;"></span>50%</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#16a34a;"></span>100%</span>
+            </div>
+            <div style="position:relative;height:220px;">
+                <canvas id="percentChart" role="img" aria-label="Pie chart of progress percentage breakdown">Progress percentage chart</canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW SECTION DROPDOWN - below charts, hidden in PDF -->
+    <div class="view-section" id="viewSectionBar">
+        <span class="view-section-label"><i class="fa-solid fa-filter" style="color:#2563eb;margin-right:6px;"></i> View Section:</span>
+
+        <select id="reportFilter" class="report-filter" onchange="FilterReport()">
+            <option value="full">Full Report</option>
+            <option value="tasks">Tasks</option>
+            <option value="employees">Employees</option>
+            <option value="assignments">Task Assignments</option>
+            <option value="progress">Task Progress</option>
+        </select>
+
+        <!-- Sub filter for Tasks - Priority -->
+        <select id="priorityFilter" class="report-filter" style="display:none;" onchange="ApplySubFilter()">
+            <option value="all">All Priorities</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+        </select>
+
+        <!-- Sub filter for Assignments - Employee -->
+        <select id="assignEmpFilter" class="report-filter" style="display:none;" onchange="ApplySubFilter()">
+            <option value="all">All Employees</option>
+        </select>
+
+        <!-- Sub filter for Progress - Employee -->
+        <select id="progressEmpFilter" class="report-filter" style="display:none;" onchange="ApplySubFilter()">
+            <option value="all">All Employees</option>
+        </select>
+
+        <!-- Sub filter for Progress - Status -->
+        <select id="progressStatusFilter" class="report-filter" style="display:none;" onchange="ApplySubFilter()">
+            <option value="all">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        </select>
+    </div>
+
+    <!-- TASKS TABLE -->
+    <div class="section-card" id="sectionTasks">
+        <div class="section-title">
+            <i class="fa-solid fa-list-check" style="color:#2563eb;"></i> Tasks
+        </div>
+        <table class="rtable" id="tasksTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Task title</th>
+                    <th>Priority</th>
+                    <th>Description</th>
+                    <th>Start date</th>
+                    <th>Due date</th>
+                </tr>
+            </thead>
+            <tbody id="tasksBody"></tbody>
+        </table>
+        <div id="tasksNoData" class="no-data" style="display:none;">No data found.</div>
+    </div>
+
+    <!-- EMPLOYEES TABLE -->
+    <div class="section-card" id="sectionEmployees">
+        <div class="section-title">
+            <i class="fa-solid fa-users" style="color:#7c3aed;"></i> Employees
+        </div>
+        <table class="rtable" id="employeesTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody id="employeesBody"></tbody>
+        </table>
+    </div>
+
+    <!-- ASSIGNMENTS TABLE -->
+    <div class="section-card" id="sectionAssignments">
+        <div class="section-title">
+            <i class="fa-solid fa-user-check" style="color:#0f766e;"></i> Task assignments
+        </div>
+        <table class="rtable" id="assignmentsTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee</th>
+                    <th>Task</th>
+                    <th>Assigned date</th>
+                </tr>
+            </thead>
+            <tbody id="assignmentsBody"></tbody>
+        </table>
+        <div id="assignmentsNoData" class="no-data" style="display:none;">No data found.</div>
+    </div>
+
+    <!-- PROGRESS TABLE -->
+    <div class="section-card" id="sectionProgress">
+        <div class="section-title">
+            <i class="fa-solid fa-chart-bar" style="color:#7c3aed;"></i> Task progress
+        </div>
+        <table class="rtable" id="progressTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Employee</th>
+                    <th>Task</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                    <th>Update date</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody id="progressBody"></tbody>
+        </table>
+        <div id="progressNoData" class="no-data" style="display:none;">No data found.</div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/javascript/reports.js?v=12"></script>
