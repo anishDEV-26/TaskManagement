@@ -412,17 +412,7 @@
         margin-top: 8px;
     }
 
-    .collab-info-box {
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
-        border-radius: 10px;
-        padding: 12px 14px;
-        margin-top: 10px;
-        color: #1e40af;
-        font-size: 13px;
-    }
-
-    .collab-error-box {
+    .collab-error-msg {
         background: #fef2f2;
         border: 1px solid #fecaca;
         border-radius: 10px;
@@ -490,7 +480,7 @@
         font-size: 13px;
         text-decoration: none;
         font-weight: 600;
-        margin-left: 6px;
+        margin-left: 4px;
     }
 
         .collab-view-link:hover {
@@ -501,16 +491,25 @@
 <div class="collab-wrapper">
     <div class="collab-sidebar collapsed" id="collabSidebar">
         <div class="collab-sidebar-header">
-            <div class="collab-sidebar-title"><i class="fa-solid fa-clock-rotate-left"></i> Chat History</div>
-            <button class="collab-history-delete" onclick="ToggleSidebar()" title="Close"><i class="fa-solid fa-xmark" style="font-size:14px;"></i></button>
+            <div class="collab-sidebar-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Chat History
+            </div>
+            <button class="collab-history-delete" onclick="ToggleSidebar()" title="Close">
+                <i class="fa-solid fa-xmark" style="font-size:14px;"></i>
+            </button>
         </div>
-        <button class="collab-new-chat-btn" onclick="NewChat()"><i class="fa-solid fa-plus"></i> New Chat</button>
+        <button class="collab-new-chat-btn" onclick="NewChat()">
+            <i class="fa-solid fa-plus"></i> New Chat
+        </button>
         <div class="collab-history-list" id="chatHistoryList"></div>
     </div>
     <div class="collab-main">
         <div class="collab-topbar">
             <div class="collab-topbar-left">
-                <div class="collab-sidebar-toggle" onclick="ToggleSidebar()" title="Chat History"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="collab-sidebar-toggle" onclick="ToggleSidebar()" title="Chat History">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
                 <div class="collab-ai-info">
                     <div class="collab-ai-avatar"><i class="fa-solid fa-robot"></i></div>
                     <div>
@@ -521,7 +520,9 @@
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
                 <span class="collab-ai-badge">AI POWERED</span>
-                <div class="collab-new-chat-top" onclick="NewChat()" title="New Chat"><i class="fa-solid fa-plus"></i></div>
+                <div class="collab-new-chat-top" onclick="NewChat()" title="New Chat">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
             </div>
         </div>
         <div class="collab-messages" id="collabMessages">
@@ -541,8 +542,10 @@
             </div>
         </div>
         <div class="collab-input-area">
-            <input type="text" id="collabInput" class="collab-input" placeholder="e.g. Suggest employee for a testing task named Login Bug Fix..." onkeypress="if(event.which==13) SendCollabMessage()" />
-            <button class="collab-send-btn" onclick="SendCollabMessage()"><i class="fa-solid fa-paper-plane" style="color:white;font-size:15px;"></i></button>
+            <input type="text" id="collabInput" class="collab-input" placeholder="Ask for recommendations or say open task creation..." onkeypress="if(event.which==13) SendCollabMessage()" />
+            <button class="collab-send-btn" onclick="SendCollabMessage()">
+                <i class="fa-solid fa-paper-plane" style="color:white;font-size:15px;"></i>
+            </button>
         </div>
     </div>
 </div>
@@ -732,38 +735,6 @@
             AddMessage('Here are all tasks:\n\n' + taskList, false); return;
         }
 
-        // Handle "assign to [task name]" when awaiting task
-        if (pendingAssign && pendingAssign.awaitingTask) {
-            var assignToMatch = t.match(/assign.*?to\s+(.+)/);
-            var taskNameInput = assignToMatch ? assignToMatch[1].trim() : t.trim();
-            var foundTask = null;
-            collabData.Tasks.forEach(function (tk) {
-                if (tk.tasktitle.toLowerCase() === taskNameInput.toLowerCase()) foundTask = tk;
-            });
-            if (!foundTask) {
-                collabData.Tasks.forEach(function (tk) {
-                    if (tk.tasktitle.toLowerCase().includes(taskNameInput.toLowerCase()) && taskNameInput.length > 2) foundTask = tk;
-                });
-            }
-            if (foundTask) {
-                pendingAssign.taskid = foundTask.taskid;
-                pendingAssign.tasktitle = foundTask.tasktitle;
-                pendingAssign.awaitingTask = false;
-                var confirmHTML2 = 'Task found! Click below to confirm:<br><button class="collab-confirm-btn" onclick="ConfirmAssignment()"><i class="fa-solid fa-check"></i> Assign ' + pendingAssign.empname + ' to &quot;' + foundTask.tasktitle + '&quot;</button>';
-                AddMessage('Task found: ' + foundTask.tasktitle + '. Click to confirm.', false, confirmHTML2);
-            } else {
-                AddMessage('Task "' + taskNameInput + '" not found. Please check the name or create it first in the Tasks page.', false);
-            }
-            return;
-        }
-
-        if (pendingAssign && !pendingAssign.awaitingTask && (t.includes('yes') || t.includes('confirm') || t.includes('ok'))) {
-            ConfirmAssignment(); return;
-        }
-        if (t.includes('no') || t.includes('cancel')) {
-            pendingAssign = null; AddMessage('Assignment cancelled. Let me know if you need anything else!', false); return;
-        }
-
         var keyword = null;
         var suggestMatch = t.match(/suggest.*?(?:for|employee.*for|who.*for|best.*for)(.*)/);
         var whoMatch = t.match(/who.*?(?:is best|should.*do|can.*do|for)(.*)/);
@@ -775,90 +746,71 @@
 
         if (keyword !== null && keyword.length > 0) { SuggestEmployee(keyword, text); return; }
 
-        AddMessage('I can help you find the best employee for a task.\n\nTry saying:\n"Suggest someone for a web development task"\n"Who is best for a testing task named Login Bug Fix?"\n"List all employees"\n"Open task creation"', false);
-    }
+        if (pendingAssign && (t.includes('yes') || t.includes('confirm') || t.includes('ok'))) { ConfirmAssignment(); return; }
+        if (t.includes('no') || t.includes('cancel')) { pendingAssign = null; AddMessage('Assignment cancelled. Let me know if you need anything else!', false); return; }
 
-    function ScoreEmployee(emp, keywords) {
-        var score = 0;
-        var role = emp.role.toLowerCase();
-        keywords.forEach(function (kw) {
-            if (role.includes(kw)) score += 10;
-            if (emp.empname.toLowerCase().includes(kw)) score += 5;
-            // Developer
-            if ((kw === 'dev' || kw === 'developer' || kw === 'development' || kw === 'code' || kw === 'coding' || kw === 'web' || kw === 'frontend' || kw === 'backend' || kw === 'fullstack' || kw === 'software' || kw === 'programmer' || kw === 'react' || kw === 'angular' || kw === 'java' || kw === 'python' || kw === 'dotnet') &&
-                (role.includes('dev') || role.includes('engineer') || role.includes('programmer') || role.includes('software') || role.includes('coder'))) score += 12;
-            // Tester / QA
-            if ((kw === 'test' || kw === 'testing' || kw === 'qa' || kw === 'quality' || kw === 'bug' || kw === 'automation' || kw === 'manual') &&
-                (role.includes('test') || role.includes('qa') || role.includes('quality'))) score += 12;
-            // Designer
-            if ((kw === 'design' || kw === 'designer' || kw === 'ui' || kw === 'ux' || kw === 'figma' || kw === 'graphic' || kw === 'creative') &&
-                (role.includes('design') || role.includes('ui') || role.includes('ux') || role.includes('creative'))) score += 12;
-            // Data Analyst
-            if ((kw === 'data' || kw === 'analysis' || kw === 'analyst' || kw === 'analytics' || kw === 'report' || kw === 'reporting' || kw === 'bi') &&
-                (role.includes('analyst') || role.includes('data') || role.includes('analytics') || role.includes('bi'))) score += 15;
-            // Manager / Lead
-            if ((kw === 'manage' || kw === 'management' || kw === 'lead' || kw === 'leader' || kw === 'scrum' || kw === 'agile' || kw === 'pm' || kw === 'coordinator') &&
-                (role.includes('manage') || role.includes('lead') || role.includes('scrum') || role.includes('pm') || role.includes('coordinator'))) score += 12;
-            // DevOps
-            if ((kw === 'devops' || kw === 'deployment' || kw === 'cicd' || kw === 'cloud' || kw === 'infrastructure' || kw === 'docker' || kw === 'kubernetes') &&
-                (role.includes('devops') || role.includes('cloud') || role.includes('infrastructure') || role.includes('sre'))) score += 12;
-            // Support / HR
-            if ((kw === 'support' || kw === 'helpdesk' || kw === 'customer') && (role.includes('support') || role.includes('helpdesk'))) score += 12;
-            if ((kw === 'hr' || kw === 'human' || kw === 'recruit') && (role.includes('hr') || role.includes('human') || role.includes('recruit'))) score += 12;
-        });
-        return score;
+        AddMessage('I can help you find the best employee for a task.\n\nTry saying:\n"Suggest someone for a web development task"\n"Who is best for a frontend project?"\n"List all employees"\n"Open task creation"', false);
     }
 
     function SuggestEmployee(keyword, originalText) {
         if (collabData.Employees.length === 0) { AddMessage('No employees found. Please add employees first.', false); return; }
 
-        var keywords = keyword.toLowerCase().split(' ').filter(function (k) { return k.length > 1; });
+        var keywords = keyword.toLowerCase().split(' ').filter(function (k) { return k.length > 2; });
 
         var scored = collabData.Employees.map(function (emp) {
-            var score = ScoreEmployee(emp, keywords);
+            var score = 0;
+            var role = emp.role.toLowerCase();
+            keywords.forEach(function (kw) {
+                if (role.includes(kw)) score += 10;
+                if (emp.empname.toLowerCase().includes(kw)) score += 5;
+                if ((kw.includes('dev') || kw.includes('code') || kw.includes('web') || kw.includes('frontend') || kw.includes('backend') || kw.includes('full')) && (role.includes('dev') || role.includes('engineer') || role.includes('programmer'))) score += 8;
+                if ((kw.includes('test') || kw.includes('qa')) && (role.includes('test') || role.includes('qa'))) score += 8;
+                if ((kw.includes('design') || kw.includes('ui') || kw.includes('ux')) && role.includes('design')) score += 8;
+                if ((kw.includes('data') || kw.includes('analyt')) && (role.includes('analyt') || role.includes('data'))) score += 8;
+                if ((kw.includes('manage') || kw.includes('lead')) && (role.includes('manage') || role.includes('lead'))) score += 8;
+            });
             var assignCount = collabData.Assignments.filter(function (a) { return a.empid === emp.empid; }).length;
             score -= assignCount * 2;
             return { emp: emp, score: score, assignCount: assignCount };
         });
         scored.sort(function (a, b) { return b.score - a.score; });
         var best = scored[0];
-        var others = scored.slice(1, 3).filter(function (s) { return s.score > 0; });
+        var others = scored.slice(1, 3).filter(function (s) { return s.score >= 0; });
 
-        // STRICT task matching — only match if user said a specific task name
-        // Filter out generic role/skill words — only keep words that could be task names
-        var genericWords = ['suggest', 'employee', 'someone', 'person', 'for', 'the', 'task', 'project', 'work', 'testing', 'development', 'design', 'analysis', 'management', 'data', 'frontend', 'backend', 'fullstack', 'ui', 'ux', 'qa', 'who', 'best', 'good', 'named', 'called', 'a', 'an', 'me', 'please', 'help', 'find', 'with', 'in', 'on', 'to', 'and', 'or', 'is', 'are'];
-        var taskKeywords = keywords.filter(function (k) { return !genericWords.includes(k) && k.length > 2; });
-
+        // Find EXACT matching task by name from user input
         var matchedTask = null;
-        if (taskKeywords.length > 0 && collabData.Tasks.length > 0) {
-            var taskScored = collabData.Tasks.map(function (tk) {
+        if (collabData.Tasks.length > 0) {
+            var taskKeywords = keyword.toLowerCase().split(' ').filter(function (k) { return k.length > 2; });
+            var taskScored = collabData.Tasks.map(function (task) {
                 var ts = 0;
                 taskKeywords.forEach(function (kw) {
-                    if (tk.tasktitle.toLowerCase().includes(kw)) ts += 10;
-                    if (tk.description && tk.description.toLowerCase().includes(kw)) ts += 3;
+                    if (task.tasktitle.toLowerCase().includes(kw)) ts += 10;
+                    if (task.description && task.description.toLowerCase().includes(kw)) ts += 3;
                 });
-                return { task: tk, score: ts };
+                return { task: task, score: ts };
             });
             taskScored.sort(function (a, b) { return b.score - a.score; });
-            if (taskScored[0].score >= 10) matchedTask = taskScored[0].task;
+            if (taskScored[0].score > 0) matchedTask = taskScored[0].task;
         }
 
-        var othersText = others.length > 0 ? '<br><small style="color:#64748b;">Other options: ' + others.map(function (s) { return s.emp.empname + ' (' + s.emp.role + ')'; }).join(', ') + '</small>' : '';
-        var replyHTML = 'For <strong>"' + keyword + '"</strong>, I suggest <strong>' + best.emp.empname + '</strong> (' + best.emp.role + ') as they have the best matching role. Current workload: ' + best.assignCount + ' task(s).' + othersText;
+        var othersText = others.length > 0 ? '\n\nOther options: ' + others.map(function (s) { return s.emp.empname + ' (' + s.emp.role + ')'; }).join(', ') : '';
+        var replyText = 'For "' + keyword + '", I suggest ' + best.emp.empname + ' (' + best.emp.role + ') as they have the best matching role.' + othersText;
+
+        var confirmHTML = replyText.replace(/\n/g, '<br>');
 
         if (matchedTask) {
-            pendingAssign = { empid: best.emp.empid, empname: best.emp.empname, taskid: matchedTask.taskid, tasktitle: matchedTask.tasktitle, awaitingTask: false };
-            replyHTML += '<br><br>Click below to confirm:<br><button class="collab-confirm-btn" onclick="ConfirmAssignment()"><i class="fa-solid fa-check"></i> Assign ' + best.emp.empname + ' to &quot;' + matchedTask.tasktitle + '&quot;</button>';
+            pendingAssign = { empid: best.emp.empid, empname: best.emp.empname, taskid: matchedTask.taskid, tasktitle: matchedTask.tasktitle };
+            confirmHTML += '<br><br>Click below to confirm:<br><button class="collab-confirm-btn" onclick="ConfirmAssignment()"><i class="fa-solid fa-check"></i> Assign ' + best.emp.empname + ' to &quot;' + matchedTask.tasktitle + '&quot;</button>';
         } else {
-            pendingAssign = { empid: best.emp.empid, empname: best.emp.empname, taskid: null, tasktitle: null, awaitingTask: true };
-            replyHTML += '<br><br><div class="collab-info-box"><i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>Which task do you want to assign to <strong>' + best.emp.empname + '</strong>?<br>Type the exact task name or say: <em>"assign to [task name]"</em></div>';
+            pendingAssign = null;
+            confirmHTML += '<br><br><div class="collab-error-msg"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Task <strong>&quot;' + keyword + '&quot;</strong> does not exist in the system. Please create it first in the <a href="/Home/Taskcreation" style="color:#2563eb;font-weight:600;">Tasks page</a>, then come back to assign.</div>';
         }
 
-        AddMessage('Suggestion for: ' + keyword, false, replyHTML);
+        AddMessage(replyText, false, confirmHTML);
     }
 
     function ConfirmAssignment() {
-        if (!pendingAssign || pendingAssign.awaitingTask) return;
+        if (!pendingAssign) return;
         var assign = pendingAssign;
         pendingAssign = null;
         $.ajax({
@@ -868,7 +820,7 @@
             dataType: "json",
             success: function (response) {
                 if (response.success) {
-                    var successHTML = '<div class="collab-success-msg"><i class="fa-solid fa-circle-check" style="font-size:16px;"></i><div><strong>' + assign.empname + '</strong> has been assigned to <strong>&quot;' + assign.tasktitle + '&quot;</strong> successfully!<a href="/Home/TaskAssign" class="collab-view-link">View in Task Assign</a></div></div>';
+                    var successHTML = '<div class="collab-success-msg"><i class="fa-solid fa-circle-check"></i><strong>' + assign.empname + '</strong> assigned to <strong>&quot;' + assign.tasktitle + '&quot;</strong>.<a href="/Home/TaskAssign" class="collab-view-link">View in Task Assign</a></div>';
                     AddMessage(assign.empname + ' assigned to "' + assign.tasktitle + '".', false, successHTML);
                     LoadCollabData();
                 } else {
