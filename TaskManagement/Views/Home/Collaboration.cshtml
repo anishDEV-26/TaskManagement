@@ -1,0 +1,881 @@
+@{
+    ViewBag.Title = "Collaboration";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+    .collab-wrapper {
+        display: flex;
+        height: calc(100vh - 126px);
+        gap: 0;
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .collab-sidebar {
+        width: 280px;
+        background: #0f172a;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        border-right: 1px solid rgba(255,255,255,0.07);
+        transition: 0.3s;
+        overflow: hidden;
+    }
+
+        .collab-sidebar.collapsed {
+            width: 0;
+        }
+
+    .collab-sidebar-header {
+        padding: 20px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .collab-sidebar-title {
+        color: white;
+        font-size: 15px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .collab-sidebar-title i {
+            color: #60a5fa;
+        }
+
+    .collab-new-chat-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        margin: 12px 16px;
+        width: calc(100% - 32px);
+        justify-content: center;
+    }
+
+        .collab-new-chat-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+    .collab-history-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+        scrollbar-width: none;
+    }
+
+        .collab-history-list::-webkit-scrollbar {
+            display: none;
+        }
+
+    .collab-history-item {
+        padding: 10px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+        .collab-history-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .collab-history-item.active {
+            background: rgba(37,99,235,0.25);
+            border: 1px solid rgba(37,99,235,0.3);
+        }
+
+    .collab-history-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .collab-history-item-title {
+        color: rgba(255,255,255,0.85);
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .collab-history-item-meta {
+        color: rgba(255,255,255,0.35);
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .collab-history-delete {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.25);
+        cursor: pointer;
+        font-size: 12px;
+        padding: 3px 5px;
+        border-radius: 5px;
+        transition: 0.2s;
+        flex-shrink: 0;
+    }
+
+        .collab-history-delete:hover {
+            background: rgba(239,68,68,0.2);
+            color: #f87171;
+        }
+
+    .collab-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        background: #f8fafc;
+    }
+
+    .collab-topbar {
+        background: white;
+        padding: 16px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .collab-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .collab-sidebar-toggle {
+        width: 36px;
+        height: 36px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #64748b;
+        font-size: 14px;
+        transition: 0.2s;
+    }
+
+        .collab-sidebar-toggle:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #2563eb;
+        }
+
+    .collab-ai-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .collab-ai-avatar {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 16px;
+    }
+
+    .collab-ai-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .collab-ai-status {
+        font-size: 12px;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 2px;
+    }
+
+    .collab-ai-dot {
+        width: 6px;
+        height: 6px;
+        background: #22c55e;
+        border-radius: 50%;
+    }
+
+    .collab-ai-badge {
+        background: linear-gradient(135deg, #7c3aed, #2563eb);
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .collab-new-chat-top {
+        width: 36px;
+        height: 36px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #64748b;
+        font-size: 16px;
+        transition: 0.2s;
+    }
+
+        .collab-new-chat-top:hover {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+    .collab-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+        .collab-messages::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .collab-messages::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 5px;
+        }
+
+    .collab-msg {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        max-width: 75%;
+    }
+
+        .collab-msg.user {
+            flex-direction: row-reverse;
+            align-self: flex-end;
+        }
+
+    .collab-msg-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+        .collab-msg-avatar.ai {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white;
+        }
+
+        .collab-msg-avatar.user {
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+            color: #64748b;
+        }
+
+    .collab-msg-bubble {
+        padding: 12px 16px;
+        border-radius: 4px 16px 16px 16px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #334155;
+        background: white;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        max-width: 100%;
+    }
+
+    .collab-msg.user .collab-msg-bubble {
+        border-radius: 16px 4px 16px 16px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        border: none;
+    }
+
+    .collab-welcome {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .collab-welcome-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 6px;
+    }
+
+    .collab-welcome-sub {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 14px;
+    }
+
+    .collab-welcome-tips {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .collab-welcome-tip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #475569;
+        padding: 7px 10px;
+        background: #f8fafc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+        border: 1px solid transparent;
+    }
+
+        .collab-welcome-tip:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #2563eb;
+        }
+
+        .collab-welcome-tip i {
+            color: #2563eb;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+    .collab-confirm-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #16a34a, #15803d);
+        color: white;
+        border: none;
+        padding: 11px 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-top: 12px;
+        box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+    }
+
+        .collab-confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(22,163,74,0.4);
+        }
+
+    .collab-success-msg {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #16a34a;
+        font-weight: 600;
+        margin-top: 8px;
+    }
+
+    .collab-info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-top: 10px;
+        color: #1e40af;
+        font-size: 13px;
+    }
+
+    .collab-error-box {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-top: 10px;
+        color: #dc2626;
+        font-size: 13px;
+    }
+
+    .collab-typing {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .collab-input-area {
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        padding: 16px 24px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .collab-input {
+        flex: 1;
+        padding: 12px 18px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 14px;
+        outline: none;
+        font-family: Inter, Arial, sans-serif;
+        transition: 0.2s;
+        background: #f8fafc;
+        color: #334155;
+    }
+
+        .collab-input:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+        }
+
+    .collab-send-btn {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+        transition: 0.2s;
+        flex-shrink: 0;
+    }
+
+        .collab-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+    .collab-view-link {
+        color: #2563eb;
+        font-size: 13px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-left: 6px;
+    }
+
+        .collab-view-link:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="collab-wrapper">
+    <div class="collab-sidebar collapsed" id="collabSidebar">
+        <div class="collab-sidebar-header">
+            <div class="collab-sidebar-title"><i class="fa-solid fa-clock-rotate-left"></i> Chat History</div>
+            <button class="collab-history-delete" onclick="ToggleSidebar()" title="Close"><i class="fa-solid fa-xmark" style="font-size:14px;"></i></button>
+        </div>
+        <button class="collab-new-chat-btn" onclick="NewChat()"><i class="fa-solid fa-plus"></i> New Chat</button>
+        <div class="collab-history-list" id="chatHistoryList"></div>
+    </div>
+    <div class="collab-main">
+        <div class="collab-topbar">
+            <div class="collab-topbar-left">
+                <div class="collab-sidebar-toggle" onclick="ToggleSidebar()" title="Chat History"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div class="collab-ai-info">
+                    <div class="collab-ai-avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div>
+                        <div class="collab-ai-name">Collaboration AI</div>
+                        <div class="collab-ai-status"><div class="collab-ai-dot"></div>Ready to help with assignments</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span class="collab-ai-badge">AI POWERED</span>
+                <div class="collab-new-chat-top" onclick="NewChat()" title="New Chat"><i class="fa-solid fa-plus"></i></div>
+            </div>
+        </div>
+        <div class="collab-messages" id="collabMessages">
+            <div class="collab-msg">
+                <div class="collab-msg-avatar ai"><i class="fa-solid fa-robot"></i></div>
+                <div class="collab-msg-bubble">
+                    <div class="collab-welcome">
+                        <div class="collab-welcome-title">Hi! I am your <strong>Collaboration AI</strong></div>
+                        <div class="collab-welcome-sub">I look through your employees and tasks to help you make the best assignment decisions.</div>
+                        <div class="collab-welcome-tips">
+                            <div class="collab-welcome-tip" onclick="SetInput('Suggest someone for a frontend task')"><i class="fa-solid fa-circle-dot"></i> "Suggest someone for a frontend task"</div>
+                            <div class="collab-welcome-tip" onclick="SetInput('Who is best for a development project?')"><i class="fa-solid fa-circle-dot"></i> "Who is best for a development project?"</div>
+                            <div class="collab-welcome-tip" onclick="SetInput('Open task creation')"><i class="fa-solid fa-circle-dot"></i> "Open task creation"</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="collab-input-area">
+            <input type="text" id="collabInput" class="collab-input" placeholder="e.g. Suggest employee for a testing task named Login Bug Fix..." onkeypress="if(event.which==13) SendCollabMessage()" />
+            <button class="collab-send-btn" onclick="SendCollabMessage()"><i class="fa-solid fa-paper-plane" style="color:white;font-size:15px;"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var collabData = null;
+    var pendingAssign = null;
+    var chatSessions = [];
+    var currentSessionId = null;
+    var sidebarOpen = false;
+
+    $(document).ready(function () {
+        LoadCollabData();
+        LoadChatHistory();
+    });
+
+    function LoadCollabData() {
+        $.ajax({
+            type: "GET", url: "/Home/GetCollaborationData", dataType: "json",
+            success: function (data) { collabData = data; },
+            error: function () { collabData = { Employees: [], Tasks: [], Assignments: [] }; }
+        });
+    }
+
+    function ToggleSidebar() {
+        sidebarOpen = !sidebarOpen;
+        var sidebar = document.getElementById('collabSidebar');
+        if (sidebarOpen) sidebar.classList.remove('collapsed');
+        else sidebar.classList.add('collapsed');
+    }
+
+    function SetInput(text) {
+        document.getElementById('collabInput').value = text;
+        document.getElementById('collabInput').focus();
+    }
+
+    function LoadChatHistory() {
+        try { var saved = localStorage.getItem('collab_sessions'); chatSessions = saved ? JSON.parse(saved) : []; }
+        catch (e) { chatSessions = []; }
+        RenderHistory();
+    }
+
+    function SaveChatHistory() {
+        try { localStorage.setItem('collab_sessions', JSON.stringify(chatSessions)); } catch (e) { }
+    }
+
+    function RenderHistory() {
+        var container = document.getElementById('chatHistoryList');
+        container.innerHTML = '';
+        if (chatSessions.length === 0) {
+            container.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:20px;">No chat history yet</div>';
+            return;
+        }
+        chatSessions.slice().reverse().forEach(function (session) {
+            var div = document.createElement('div');
+            div.className = 'collab-history-item' + (session.id === currentSessionId ? ' active' : '');
+            div.innerHTML = '<div class="collab-history-item-info" onclick="LoadSession(\'' + session.id + '\')">' +
+                '<div class="collab-history-item-title">' + session.title + '</div>' +
+                '<div class="collab-history-item-meta">' + session.date + ' &nbsp;&middot;&nbsp; ' + session.msgCount + ' msgs</div></div>' +
+                '<button class="collab-history-delete" onclick="DeleteSession(\'' + session.id + '\')"><i class="fa-solid fa-trash"></i></button>';
+            container.appendChild(div);
+        });
+    }
+
+    function NewChat() {
+        currentSessionId = null;
+        pendingAssign = null;
+        var container = document.getElementById('collabMessages');
+        container.innerHTML = '<div class="collab-msg"><div class="collab-msg-avatar ai"><i class="fa-solid fa-robot"></i></div><div class="collab-msg-bubble"><div class="collab-welcome"><div class="collab-welcome-title">Hi! I am your <strong>Collaboration AI</strong></div><div class="collab-welcome-sub">I look through your employees and tasks to help you make the best assignment decisions.</div><div class="collab-welcome-tips"><div class="collab-welcome-tip" onclick="SetInput(\'Suggest someone for a frontend task\')"><i class="fa-solid fa-circle-dot"></i> "Suggest someone for a frontend task"</div><div class="collab-welcome-tip" onclick="SetInput(\'Who is best for a development project?\')"><i class="fa-solid fa-circle-dot"></i> "Who is best for a development project?"</div><div class="collab-welcome-tip" onclick="SetInput(\'Open task creation\')"><i class="fa-solid fa-circle-dot"></i> "Open task creation"</div></div></div></div></div>';
+        RenderHistory();
+    }
+
+    function EnsureSession(firstMessage) {
+        if (!currentSessionId) {
+            var id = 'session_' + Date.now();
+            var today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+            currentSessionId = id;
+            chatSessions.push({ id: id, title: firstMessage.substring(0, 35) + (firstMessage.length > 35 ? '...' : ''), date: today, msgCount: 0, messages: [] });
+            SaveChatHistory();
+            RenderHistory();
+        }
+    }
+
+    function LoadSession(sessionId) {
+        var session = chatSessions.find(function (s) { return s.id === sessionId; });
+        if (!session) return;
+        currentSessionId = sessionId;
+        pendingAssign = null;
+        var container = document.getElementById('collabMessages');
+        container.innerHTML = '';
+        session.messages.forEach(function (msg) { AppendMessageHTML(msg.text, msg.isUser, msg.html); });
+        RenderHistory();
+    }
+
+    function DeleteSession(sessionId) {
+        chatSessions = chatSessions.filter(function (s) { return s.id !== sessionId; });
+        SaveChatHistory();
+        if (currentSessionId === sessionId) NewChat();
+        else RenderHistory();
+    }
+
+    function GetCurrentSession() {
+        return chatSessions.find(function (s) { return s.id === currentSessionId; });
+    }
+
+    function AppendMessageHTML(text, isUser, customHTML) {
+        var container = document.getElementById('collabMessages');
+        var div = document.createElement('div');
+        div.className = 'collab-msg' + (isUser ? ' user' : '');
+        div.style.maxWidth = isUser ? '70%' : '80%';
+        div.style.alignSelf = isUser ? 'flex-end' : 'flex-start';
+        var avatar = document.createElement('div');
+        avatar.className = 'collab-msg-avatar ' + (isUser ? 'user' : 'ai');
+        avatar.innerHTML = isUser ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+        var bubble = document.createElement('div');
+        bubble.className = 'collab-msg-bubble';
+        if (customHTML) bubble.innerHTML = customHTML;
+        else { bubble.style.whiteSpace = 'pre-line'; bubble.innerText = text; }
+        div.appendChild(avatar);
+        div.appendChild(bubble);
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function AddMessage(text, isUser, customHTML) {
+        AppendMessageHTML(text, isUser, customHTML);
+        var session = GetCurrentSession();
+        if (session) {
+            session.messages.push({ text: text, isUser: isUser, html: customHTML || null });
+            session.msgCount = session.messages.length;
+            SaveChatHistory();
+            RenderHistory();
+        }
+    }
+
+    function AddTyping() {
+        var container = document.getElementById('collabMessages');
+        var div = document.createElement('div');
+        div.id = 'collabTyping';
+        div.className = 'collab-typing';
+        div.innerHTML = '<div class="collab-msg-avatar ai"><i class="fa-solid fa-robot"></i></div><div class="collab-msg-bubble"><div style="display:flex;gap:5px;align-items:center;height:18px;"><div style="width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:bounce 1s infinite;"></div><div style="width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:bounce 1s infinite 0.2s;"></div><div style="width:7px;height:7px;background:#94a3b8;border-radius:50%;animation:bounce 1s infinite 0.4s;"></div></div></div>';
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function RemoveTyping() { var t = document.getElementById('collabTyping'); if (t) t.remove(); }
+
+    function SendCollabMessage() {
+        var input = document.getElementById('collabInput');
+        var text = input.value.trim();
+        if (!text) return;
+        EnsureSession(text);
+        AddMessage(text, true);
+        input.value = '';
+        AddTyping();
+        setTimeout(function () { RemoveTyping(); ProcessCollabMessage(text); }, 900);
+    }
+
+    function ProcessCollabMessage(text) {
+        var t = text.toLowerCase();
+        if (!collabData) { AddMessage('Still loading data. Please try again.', false); return; }
+
+        if (t.includes('open task creation') || t.includes('go to task') || t.includes('create task')) {
+            AddMessage('Opening Task Creation page...', false);
+            setTimeout(function () { window.location.href = '/Home/Taskcreation'; }, 1000); return;
+        }
+        if (t.includes('open dashboard') || t.includes('go to dashboard')) {
+            AddMessage('Opening Dashboard...', false);
+            setTimeout(function () { window.location.href = '/Home/Dashboard'; }, 1000); return;
+        }
+        if (t.includes('open employee') || t.includes('go to employee')) {
+            AddMessage('Opening Employees page...', false);
+            setTimeout(function () { window.location.href = '/Home/employee'; }, 1000); return;
+        }
+        if (t.includes('open assign') || t.includes('go to assign')) {
+            AddMessage('Opening Task Assignment page...', false);
+            setTimeout(function () { window.location.href = '/Home/TaskAssign'; }, 1000); return;
+        }
+        if (t.includes('list employee') || t.includes('show employee') || t.includes('all employee')) {
+            if (collabData.Employees.length === 0) { AddMessage('No employees found.', false); return; }
+            var empList = collabData.Employees.map(function (e, i) { return (i + 1) + '. ' + e.empname + ' - ' + e.role; }).join('\n');
+            AddMessage('Here are all employees:\n\n' + empList, false); return;
+        }
+        if (t.includes('list task') || t.includes('show task') || t.includes('all task')) {
+            if (collabData.Tasks.length === 0) { AddMessage('No tasks found.', false); return; }
+            var taskList = collabData.Tasks.map(function (tk, i) { return (i + 1) + '. ' + tk.tasktitle + ' - ' + tk.priority + ' priority'; }).join('\n');
+            AddMessage('Here are all tasks:\n\n' + taskList, false); return;
+        }
+
+        // Handle "assign to [task name]" when awaiting task
+        if (pendingAssign && pendingAssign.awaitingTask) {
+            var assignToMatch = t.match(/assign.*?to\s+(.+)/);
+            var taskNameInput = assignToMatch ? assignToMatch[1].trim() : t.trim();
+            var foundTask = null;
+            collabData.Tasks.forEach(function (tk) {
+                if (tk.tasktitle.toLowerCase() === taskNameInput.toLowerCase()) foundTask = tk;
+            });
+            if (!foundTask) {
+                collabData.Tasks.forEach(function (tk) {
+                    if (tk.tasktitle.toLowerCase().includes(taskNameInput.toLowerCase()) && taskNameInput.length > 2) foundTask = tk;
+                });
+            }
+            if (foundTask) {
+                pendingAssign.taskid = foundTask.taskid;
+                pendingAssign.tasktitle = foundTask.tasktitle;
+                pendingAssign.awaitingTask = false;
+                var confirmHTML2 = 'Task found! Click below to confirm:<br><button class="collab-confirm-btn" onclick="ConfirmAssignment()"><i class="fa-solid fa-check"></i> Assign ' + pendingAssign.empname + ' to &quot;' + foundTask.tasktitle + '&quot;</button>';
+                AddMessage('Task found: ' + foundTask.tasktitle + '. Click to confirm.', false, confirmHTML2);
+            } else {
+                AddMessage('Task "' + taskNameInput + '" not found. Please check the name or create it first in the Tasks page.', false);
+            }
+            return;
+        }
+
+        if (pendingAssign && !pendingAssign.awaitingTask && (t.includes('yes') || t.includes('confirm') || t.includes('ok'))) {
+            ConfirmAssignment(); return;
+        }
+        if (t.includes('no') || t.includes('cancel')) {
+            pendingAssign = null; AddMessage('Assignment cancelled. Let me know if you need anything else!', false); return;
+        }
+
+        var keyword = null;
+        var suggestMatch = t.match(/suggest.*?(?:for|employee.*for|who.*for|best.*for)(.*)/);
+        var whoMatch = t.match(/who.*?(?:is best|should.*do|can.*do|for)(.*)/);
+        if (suggestMatch) keyword = suggestMatch[1].trim();
+        else if (whoMatch) keyword = whoMatch[1].trim();
+        else if (t.includes('suggest') || t.includes('recommend') || t.includes('who is best') || t.includes('who should')) {
+            keyword = t.replace(/suggest|recommend|who is best|who should|me|the|employee|for|a|an|do|this|task|project/g, '').trim();
+        }
+
+        if (keyword !== null && keyword.length > 0) { SuggestEmployee(keyword, text); return; }
+
+        AddMessage('I can help you find the best employee for a task.\n\nTry saying:\n"Suggest someone for a web development task"\n"Who is best for a testing task named Login Bug Fix?"\n"List all employees"\n"Open task creation"', false);
+    }
+
+    function ScoreEmployee(emp, keywords) {
+        var score = 0;
+        var role = emp.role.toLowerCase();
+        keywords.forEach(function (kw) {
+            if (role.includes(kw)) score += 10;
+            if (emp.empname.toLowerCase().includes(kw)) score += 5;
+            // Developer
+            if ((kw === 'dev' || kw === 'developer' || kw === 'development' || kw === 'code' || kw === 'coding' || kw === 'web' || kw === 'frontend' || kw === 'backend' || kw === 'fullstack' || kw === 'software' || kw === 'programmer' || kw === 'react' || kw === 'angular' || kw === 'java' || kw === 'python' || kw === 'dotnet') &&
+                (role.includes('dev') || role.includes('engineer') || role.includes('programmer') || role.includes('software') || role.includes('coder'))) score += 12;
+            // Tester / QA
+            if ((kw === 'test' || kw === 'testing' || kw === 'qa' || kw === 'quality' || kw === 'bug' || kw === 'automation' || kw === 'manual') &&
+                (role.includes('test') || role.includes('qa') || role.includes('quality'))) score += 12;
+            // Designer
+            if ((kw === 'design' || kw === 'designer' || kw === 'ui' || kw === 'ux' || kw === 'figma' || kw === 'graphic' || kw === 'creative') &&
+                (role.includes('design') || role.includes('ui') || role.includes('ux') || role.includes('creative'))) score += 12;
+            // Data Analyst
+            if ((kw === 'data' || kw === 'analysis' || kw === 'analyst' || kw === 'analytics' || kw === 'report' || kw === 'reporting' || kw === 'bi') &&
+                (role.includes('analyst') || role.includes('data') || role.includes('analytics') || role.includes('bi'))) score += 15;
+            // Manager / Lead
+            if ((kw === 'manage' || kw === 'management' || kw === 'lead' || kw === 'leader' || kw === 'scrum' || kw === 'agile' || kw === 'pm' || kw === 'coordinator') &&
+                (role.includes('manage') || role.includes('lead') || role.includes('scrum') || role.includes('pm') || role.includes('coordinator'))) score += 12;
+            // DevOps
+            if ((kw === 'devops' || kw === 'deployment' || kw === 'cicd' || kw === 'cloud' || kw === 'infrastructure' || kw === 'docker' || kw === 'kubernetes') &&
+                (role.includes('devops') || role.includes('cloud') || role.includes('infrastructure') || role.includes('sre'))) score += 12;
+            // Support / HR
+            if ((kw === 'support' || kw === 'helpdesk' || kw === 'customer') && (role.includes('support') || role.includes('helpdesk'))) score += 12;
+            if ((kw === 'hr' || kw === 'human' || kw === 'recruit') && (role.includes('hr') || role.includes('human') || role.includes('recruit'))) score += 12;
+        });
+        return score;
+    }
+
+    function SuggestEmployee(keyword, originalText) {
+        if (collabData.Employees.length === 0) { AddMessage('No employees found. Please add employees first.', false); return; }
+
+        var keywords = keyword.toLowerCase().split(' ').filter(function (k) { return k.length > 1; });
+
+        var scored = collabData.Employees.map(function (emp) {
+            var score = ScoreEmployee(emp, keywords);
+            var assignCount = collabData.Assignments.filter(function (a) { return a.empid === emp.empid; }).length;
+            score -= assignCount * 2;
+            return { emp: emp, score: score, assignCount: assignCount };
+        });
+        scored.sort(function (a, b) { return b.score - a.score; });
+        var best = scored[0];
+        var others = scored.slice(1, 3).filter(function (s) { return s.score > 0; });
+
+        // STRICT task matching — only match if user said a specific task name
+        // Filter out generic role/skill words — only keep words that could be task names
+        var genericWords = ['suggest', 'employee', 'someone', 'person', 'for', 'the', 'task', 'project', 'work', 'testing', 'development', 'design', 'analysis', 'management', 'data', 'frontend', 'backend', 'fullstack', 'ui', 'ux', 'qa', 'who', 'best', 'good', 'named', 'called', 'a', 'an', 'me', 'please', 'help', 'find', 'with', 'in', 'on', 'to', 'and', 'or', 'is', 'are'];
+        var taskKeywords = keywords.filter(function (k) { return !genericWords.includes(k) && k.length > 2; });
+
+        var matchedTask = null;
+        if (taskKeywords.length > 0 && collabData.Tasks.length > 0) {
+            var taskScored = collabData.Tasks.map(function (tk) {
+                var ts = 0;
+                taskKeywords.forEach(function (kw) {
+                    if (tk.tasktitle.toLowerCase().includes(kw)) ts += 10;
+                    if (tk.description && tk.description.toLowerCase().includes(kw)) ts += 3;
+                });
+                return { task: tk, score: ts };
+            });
+            taskScored.sort(function (a, b) { return b.score - a.score; });
+            if (taskScored[0].score >= 10) matchedTask = taskScored[0].task;
+        }
+
+        var othersText = others.length > 0 ? '<br><small style="color:#64748b;">Other options: ' + others.map(function (s) { return s.emp.empname + ' (' + s.emp.role + ')'; }).join(', ') + '</small>' : '';
+        var replyHTML = 'For <strong>"' + keyword + '"</strong>, I suggest <strong>' + best.emp.empname + '</strong> (' + best.emp.role + ') as they have the best matching role. Current workload: ' + best.assignCount + ' task(s).' + othersText;
+
+        if (matchedTask) {
+            pendingAssign = { empid: best.emp.empid, empname: best.emp.empname, taskid: matchedTask.taskid, tasktitle: matchedTask.tasktitle, awaitingTask: false };
+            replyHTML += '<br><br>Click below to confirm:<br><button class="collab-confirm-btn" onclick="ConfirmAssignment()"><i class="fa-solid fa-check"></i> Assign ' + best.emp.empname + ' to &quot;' + matchedTask.tasktitle + '&quot;</button>';
+        } else {
+            pendingAssign = { empid: best.emp.empid, empname: best.emp.empname, taskid: null, tasktitle: null, awaitingTask: true };
+            replyHTML += '<br><br><div class="collab-info-box"><i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>Which task do you want to assign to <strong>' + best.emp.empname + '</strong>?<br>Type the exact task name or say: <em>"assign to [task name]"</em></div>';
+        }
+
+        AddMessage('Suggestion for: ' + keyword, false, replyHTML);
+    }
+
+    function ConfirmAssignment() {
+        if (!pendingAssign || pendingAssign.awaitingTask) return;
+        var assign = pendingAssign;
+        pendingAssign = null;
+        $.ajax({
+            type: "POST", url: "/Home/SaveCollaborationAssign",
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({ empid: assign.empid, taskid: assign.taskid, assigneddate: new Date().toISOString().split('T')[0] }),
+            dataType: "json",
+            success: function (response) {
+                if (response.success) {
+                    var successHTML = '<div class="collab-success-msg"><i class="fa-solid fa-circle-check" style="font-size:16px;"></i><div><strong>' + assign.empname + '</strong> has been assigned to <strong>&quot;' + assign.tasktitle + '&quot;</strong> successfully!<a href="/Home/TaskAssign" class="collab-view-link">View in Task Assign</a></div></div>';
+                    AddMessage(assign.empname + ' assigned to "' + assign.tasktitle + '".', false, successHTML);
+                    LoadCollabData();
+                } else {
+                    AddMessage('Failed to assign: ' + response.message, false);
+                }
+            },
+            error: function () { AddMessage('Something went wrong while assigning.', false); }
+        });
+    }
+</script>

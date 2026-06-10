@@ -298,6 +298,36 @@ namespace TaskManagement.Controllers
             return View();
         }
 
+        public ActionResult Collaboration()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public JsonResult GetCollaborationData()
+        {
+            var employees = masterdal.getEmployee();
+            var tasks = masterdal.getTask();
+            var assignments = masterdal.getTaskAssign();
+
+            return Json(new
+            {
+                Employees = employees != null ? employees.GetList : new System.Collections.Generic.List<EmployeeDetails>(),
+                Tasks = tasks != null ? tasks.GetList : new System.Collections.Generic.List<TaskDetails>(),
+                Assignments = assignments != null ? assignments.GetList : new System.Collections.Generic.List<TaskAssignDetails>()
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult SaveCollaborationAssign(TaskAssignDetails assign)
+        {
+            bool IsExecuted = masterdal.SaveTaskAssign(assign);
+            if (IsExecuted)
+                return Json(new { success = true, message = "Task assigned successfully." });
+            else
+                return Json(new { success = false, message = "Failed to assign task." });
+        }
+
         [HttpPost]
         public JsonResult UploadEmployeePdf(int empid)
         {

@@ -1,8 +1,8 @@
-﻿@{
+
+@{
     ViewBag.Title = "Login";
     Layout = null;
 }
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -128,6 +128,24 @@
                 box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
             }
 
+        .login-select {
+            width: 100%;
+            padding: 13px 13px 13px 42px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+            appearance: none;
+            background: white;
+            cursor: pointer;
+        }
+
+            .login-select:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            }
+
         .login-btn {
             width: 100%;
             padding: 14px;
@@ -185,7 +203,7 @@
             margin-bottom: 15px;
             display: none;
         }
-        /* FORGOT PASSWORD MODAL */
+
         .fp-overlay {
             position: fixed;
             top: 0;
@@ -324,18 +342,14 @@
 <body>
     <div class="login-wrapper">
         <div class="login-left">
-            <div class="login-left-icon">
-                <i class="fa-solid fa-list-check"></i>
-            </div>
+            <div class="login-left-icon"><i class="fa-solid fa-list-check"></i></div>
             <div class="login-left-title">Task Management System</div>
             <div class="login-left-subtitle">Manage your tasks, employees and track progress all in one place.</div>
         </div>
         <div class="login-right">
             <div class="login-title">Welcome back!</div>
             <div class="login-subtitle">Please sign in to your account</div>
-
             <div class="login-error" id="loginError"></div>
-
             <div class="login-group">
                 <label><i class="fa-solid fa-user" style="margin-right:6px;color:#2563eb;"></i> Username or Email</label>
                 <div class="login-input-wrap">
@@ -343,51 +357,50 @@
                     <input type="text" id="inputUsernameEmail" class="login-input" placeholder="Enter username or email" />
                 </div>
             </div>
-
             <div class="login-group">
                 <label><i class="fa-solid fa-lock" style="margin-right:6px;color:#2563eb;"></i> Password</label>
                 <div class="login-input-wrap">
                     <i class="fa-solid fa-lock"></i>
                     <input type="password" id="inputPassword" class="login-input" placeholder="Enter password" />
                 </div>
-                <div class="login-forgot">
+            </div>
+            <div class="login-group">
+                <label><i class="fa-solid fa-shield-halved" style="margin-right:6px;color:#2563eb;"></i> Login As</label>
+                <div class="login-input-wrap">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <select id="inputRole" class="login-select" onchange="ToggleRoleOptions()">
+                        <option value="">-- Select Role --</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Employee">Employee</option>
+                    </select>
+                </div>
+                <div class="login-forgot" id="forgotPasswordLink">
                     <a onclick="OpenForgotPassword()">Forgot password?</a>
                 </div>
             </div>
-
             <button class="login-btn" onclick="Login()">
                 <i class="fa-solid fa-right-to-bracket" style="margin-right:8px;"></i> Sign In
             </button>
-
-            <div class="login-signup">
-                Don't have an account? <a href="/Account/Signup">Sign Up</a>
+            <div class="login-signup" id="signupLink">
+                Do not have an account? <a href="/Account/Signup">Sign Up</a>
             </div>
         </div>
     </div>
-
-    <!-- FORGOT PASSWORD MODAL -->
     <div class="fp-overlay" id="fpOverlay">
         <div class="fp-modal">
             <div class="fp-title"><i class="fa-solid fa-key" style="color:#2563eb;margin-right:8px;"></i> Reset Password</div>
             <div class="fp-subtitle">Enter your username or email to reset your password</div>
-
             <div class="fp-error" id="fpError"></div>
             <div class="fp-success" id="fpSuccess"></div>
             <div class="fp-hint" id="fpHint"></div>
-
-            <!-- Step 1 - Enter username/email -->
             <div id="fpStep1">
                 <div class="fp-group">
                     <label>Username or Email</label>
                     <input type="text" id="fpUsernameEmail" class="fp-input" placeholder="Enter your username or email" />
                 </div>
-                <button class="fp-btn" onclick="VerifyUser()">
-                    <i class="fa-solid fa-search" style="margin-right:6px;"></i> Find My Account
-                </button>
+                <button class="fp-btn" onclick="VerifyUser()"><i class="fa-solid fa-search" style="margin-right:6px;"></i> Find My Account</button>
                 <button class="fp-cancel" onclick="CloseForgotPassword()">Cancel</button>
             </div>
-
-            <!-- Step 2 - Enter new password -->
             <div class="fp-step2" id="fpStep2">
                 <div class="fp-group">
                     <label>New Password</label>
@@ -397,28 +410,34 @@
                     <label>Confirm New Password</label>
                     <input type="password" id="fpConfirmPassword" class="fp-input" placeholder="Confirm new password" />
                 </div>
-                <button class="fp-btn" onclick="ResetPassword()">
-                    <i class="fa-solid fa-lock" style="margin-right:6px;"></i> Reset Password
-                </button>
+                <button class="fp-btn" onclick="ResetPassword()"><i class="fa-solid fa-lock" style="margin-right:6px;"></i> Reset Password</button>
                 <button class="fp-cancel" onclick="CloseForgotPassword()">Cancel</button>
             </div>
         </div>
     </div>
-
     <script>
+        function ToggleRoleOptions() {
+            var role = $("#inputRole").val();
+            if (role === "Employee") {
+                $("#forgotPasswordLink").hide();
+                $("#signupLink").hide();
+            } else {
+                $("#forgotPasswordLink").show();
+                $("#signupLink").show();
+            }
+        }
         function Login() {
-            let usernameoremail = $("#inputUsernameEmail").val();
-            let password = $("#inputPassword").val();
-
-            if (usernameoremail == '' || password == '') {
-                $("#loginError").text("Please fill in all fields.").show();
+            var role = $("#inputRole").val();
+            var usernameoremail = $("#inputUsernameEmail").val();
+            var password = $("#inputPassword").val();
+            if (role == "" || usernameoremail == "" || password == "") {
+                $("#loginError").text("Please fill in all fields including role.").show();
                 return;
             }
-
             $.ajax({
                 type: "POST",
                 url: "/Account/LoginUser",
-                data: { usernameoremail: usernameoremail, password: password },
+                data: { usernameoremail: usernameoremail, password: password, role: role },
                 dataType: "json",
                 success: function (response) {
                     if (response.success) {
@@ -432,95 +451,47 @@
                 }
             });
         }
-
-        $(document).keypress(function (e) {
-            if (e.which == 13) Login();
-        });
-
+        $(document).keypress(function (e) { if (e.which == 13) Login(); });
         function OpenForgotPassword() {
-            $("#fpOverlay").addClass('show');
-            $("#fpError").hide();
-            $("#fpSuccess").hide();
-            $("#fpHint").hide();
-            $("#fpUsernameEmail").val('');
-            $("#fpNewPassword").val('');
-            $("#fpConfirmPassword").val('');
-            $("#fpStep1").show();
-            $("#fpStep2").hide();
+            $("#fpOverlay").addClass("show");
+            $("#fpError").hide(); $("#fpSuccess").hide(); $("#fpHint").hide();
+            $("#fpUsernameEmail").val(""); $("#fpNewPassword").val(""); $("#fpConfirmPassword").val("");
+            $("#fpStep1").show(); $("#fpStep2").hide();
         }
-
-        function CloseForgotPassword() {
-            $("#fpOverlay").removeClass('show');
-        }
-
+        function CloseForgotPassword() { $("#fpOverlay").removeClass("show"); }
         function VerifyUser() {
-            let usernameoremail = $("#fpUsernameEmail").val().trim();
-
-            if (usernameoremail == '') {
-                $("#fpError").text("Please enter your username or email.").show();
-                return;
-            }
-
+            var usernameoremail = $("#fpUsernameEmail").val().trim();
+            if (usernameoremail == "") { $("#fpError").text("Please enter your username or email.").show(); return; }
             $.ajax({
-                type: "POST",
-                url: "/Home/GetUserForReset",
-                data: { usernameoremail: usernameoremail },
-                dataType: "json",
+                type: "POST", url: "/Home/GetUserForReset",
+                data: { usernameoremail: usernameoremail }, dataType: "json",
                 success: function (response) {
                     if (response.success) {
                         $("#fpError").hide();
-                        $("#fpHint").text("Account found: " + response.fullname + "  |  Phone: " + response.maskedphone).show();
-                        $("#fpStep1").hide();
-                        $("#fpStep2").show();
-                    } else {
-                        $("#fpError").text(response.message).show();
-                    }
+                        $("#fpHint").text("Account found: " + response.fullname + " | Phone: " + response.maskedphone).show();
+                        $("#fpStep1").hide(); $("#fpStep2").show();
+                    } else { $("#fpError").text(response.message).show(); }
                 },
-                error: function () {
-                    $("#fpError").text("Something went wrong. Please try again.").show();
-                }
+                error: function () { $("#fpError").text("Something went wrong.").show(); }
             });
         }
-
         function ResetPassword() {
-            let usernameoremail = $("#fpUsernameEmail").val().trim();
-            let newpassword = $("#fpNewPassword").val().trim();
-            let confirmpassword = $("#fpConfirmPassword").val().trim();
-
-            if (newpassword == '' || confirmpassword == '') {
-                $("#fpError").text("Please fill in all password fields.").show();
-                return;
-            }
-
-            if (newpassword != confirmpassword) {
-                $("#fpError").text("Passwords do not match.").show();
-                return;
-            }
-
-            if (newpassword.length < 6) {
-                $("#fpError").text("Password must be at least 6 characters.").show();
-                return;
-            }
-
+            var usernameoremail = $("#fpUsernameEmail").val().trim();
+            var newpassword = $("#fpNewPassword").val().trim();
+            var confirmpassword = $("#fpConfirmPassword").val().trim();
+            if (newpassword == "" || confirmpassword == "") { $("#fpError").text("Please fill in all password fields.").show(); return; }
+            if (newpassword != confirmpassword) { $("#fpError").text("Passwords do not match.").show(); return; }
+            if (newpassword.length < 6) { $("#fpError").text("Password must be at least 6 characters.").show(); return; }
             $.ajax({
-                type: "POST",
-                url: "/Home/ResetPassword",
-                data: { usernameoremail: usernameoremail, newpassword: newpassword },
-                dataType: "json",
+                type: "POST", url: "/Home/ResetPassword",
+                data: { usernameoremail: usernameoremail, newpassword: newpassword }, dataType: "json",
                 success: function (response) {
                     if (response.success) {
-                        $("#fpError").hide();
-                        $("#fpSuccess").text(response.message).show();
-                        setTimeout(function () {
-                            CloseForgotPassword();
-                        }, 2000);
-                    } else {
-                        $("#fpError").text(response.message).show();
-                    }
+                        $("#fpError").hide(); $("#fpSuccess").text(response.message).show();
+                        setTimeout(function () { CloseForgotPassword(); }, 2000);
+                    } else { $("#fpError").text(response.message).show(); }
                 },
-                error: function () {
-                    $("#fpError").text("Something went wrong. Please try again.").show();
-                }
+                error: function () { $("#fpError").text("Something went wrong.").show(); }
             });
         }
     </script>

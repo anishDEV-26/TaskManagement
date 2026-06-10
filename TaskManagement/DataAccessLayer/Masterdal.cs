@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -633,6 +633,7 @@ namespace TaskManagement.DataAccessLayer
                 cmd.Parameters.AddWithValue("@email", user.email.Trim());
                 cmd.Parameters.AddWithValue("@password", user.password.Trim());
                 cmd.Parameters.AddWithValue("@phonenumber", user.phonenumber.Trim());
+                cmd.Parameters.AddWithValue("@role", user.role.Trim());
                 cmd.Parameters.AddWithValue("@createddate", DateTime.Now);
 
                 int rowAffected = cmd.ExecuteNonQuery();
@@ -647,7 +648,7 @@ namespace TaskManagement.DataAccessLayer
             }
         }
 
-        public UserDetails LoginUser(string usernameoremail, string password)
+        public UserDetails LoginUser(string usernameoremail, string password, string role)
         {
             try
             {
@@ -656,6 +657,7 @@ namespace TaskManagement.DataAccessLayer
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@usernameoremail", usernameoremail.Trim());
                 cmd.Parameters.AddWithValue("@password", password.Trim());
+                cmd.Parameters.AddWithValue("@role", role.Trim());
 
                 SqlDataAdapter adp = new SqlDataAdapter();
                 adp.SelectCommand = cmd;
@@ -670,6 +672,7 @@ namespace TaskManagement.DataAccessLayer
                     user.fullname = dtr["FullName"].ToString();
                     user.username = dtr["Username"].ToString();
                     user.email = dtr["Email"].ToString();
+                    user.role = dtr["Role"].ToString();
                     return user;
                 }
                 return null;
@@ -817,6 +820,7 @@ namespace TaskManagement.DataAccessLayer
                     user.fullname = dtr["FullName"].ToString();
                     user.username = dtr["Username"].ToString();
                     user.email = dtr["Email"].ToString();
+                    user.role = dtr["Role"].ToString();
                     user.phonenumber = dtr["PhoneNumber"].ToString();
                     return user;
                 }

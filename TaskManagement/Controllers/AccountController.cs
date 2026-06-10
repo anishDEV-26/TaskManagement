@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Mvc;
 using TaskManagement.DataAccessLayer;
 using TaskManagement.Models;
@@ -20,14 +20,15 @@ namespace TaskManagement.Controllers
         }
 
         [HttpPost]
-        public JsonResult LoginUser(string usernameoremail, string password)
+        public JsonResult LoginUser(string usernameoremail, string password, string role)
         {
-            var user = masterdal.LoginUser(usernameoremail, password);
+            var user = masterdal.LoginUser(usernameoremail, password, role);
             if (user != null)
             {
                 Session["UserId"] = user.userid;
                 Session["FullName"] = user.fullname;
                 Session["Username"] = user.username;
+                Session["Role"] = user.role;
                 return Json(new { success = true, message = "Login successful." });
             }
             else
