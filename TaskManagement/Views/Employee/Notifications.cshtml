@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "Notifications";
+    Layout = "~/Views/Shared/_EmployeeLayout.cshtml";
+}
+<style>
+    .nt-page-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .nt-page-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+
+    .nt-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 700px;
+    }
+
+    .nt-item {
+        background: white;
+        border-radius: 14px;
+        padding: 16px 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        border: 1px solid #f1f5f9;
+        border-left: 4px solid #0d9488;
+    }
+
+        .nt-item.duesoon {
+            border-left-color: #ea580c;
+        }
+
+    .nt-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: #f0fdfa;
+        color: #0d9488;
+        font-size: 16px;
+    }
+
+    .nt-item.duesoon .nt-icon {
+        background: #fff7ed;
+        color: #ea580c;
+    }
+
+    .nt-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .nt-date {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 4px;
+    }
+
+    .nt-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+
+        .nt-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+            color: #cbd5e1;
+        }
+</style>
+<div class="nt-page-title"><i class="fa-solid fa-bell" style="color:#0d9488;"></i> Notifications</div>
+<div class="nt-page-subtitle">New task assignments and upcoming due dates</div>
+<div class="nt-list" id="notifList"></div>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET", url: "/Employee/GetMyNotifications", dataType: "json",
+            success: function (data) {
+                var container = $('#notifList');
+                container.empty();
+                if (!data || data.length === 0) {
+                    container.html('<div class="nt-empty"><i class="fa-solid fa-bell-slash"></i>No notifications right now.</div>');
+                    return;
+                }
+                data.forEach(function (n) {
+                    var ts = parseInt(n.date.replace('/Date(', '').replace(')/', ''));
+                    var dateStr = new Date(ts).toLocaleDateString('en-GB');
+                    var cls = n.type === 'duesoon' ? 'duesoon' : '';
+                    var icon = n.type === 'duesoon' ? 'fa-triangle-exclamation' : 'fa-circle-plus';
+                    container.append('<div class="nt-item ' + cls + '"><div class="nt-icon"><i class="fa-solid ' + icon + '"></i></div><div><div class="nt-title">' + n.title + '</div><div class="nt-date">' + dateStr + '</div></div></div>');
+                });
+            }
+        });
+    });
+</script>

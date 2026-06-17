@@ -239,6 +239,7 @@ namespace TaskManagement.DataAccessLayer
                 cmd.Parameters.AddWithValue("@email", emp.email.Trim());
                 cmd.Parameters.AddWithValue("@mobile", emp.mobile.Trim());
                 cmd.Parameters.AddWithValue("@role", emp.role.Trim());
+                cmd.Parameters.AddWithValue("@password", emp.password != null ? emp.password.Trim() : "");
                 cmd.Parameters.AddWithValue("@CreatedBy", "admin");
                 cmd.Parameters.AddWithValue("@CreatedDate", DateTime.Now);
                 cmd.Parameters.AddWithValue("@UpdateBy", "admin");
@@ -282,7 +283,8 @@ namespace TaskManagement.DataAccessLayer
                         E.email = dtr["Email"].ToString();
                         E.mobile = dtr["Mobile"].ToString();
                         E.role = dtr["Role"].ToString();
-                        emps.Add(E);
+                            E.password = dtr["Password"] != DBNull.Value ? dtr["Password"].ToString() : "";
+                            emps.Add(E);
                     }
 
                     EL.GetList = emps;
@@ -321,6 +323,7 @@ namespace TaskManagement.DataAccessLayer
                     E.email = dtr["Email"].ToString();
                     E.mobile = dtr["Mobile"].ToString();
                     E.role = dtr["Role"].ToString();
+                    E.password = dtr["Password"] != DBNull.Value ? dtr["Password"].ToString() : "";
                     return E;
                 }
                 return null;
@@ -346,6 +349,7 @@ namespace TaskManagement.DataAccessLayer
                 cmd.Parameters.AddWithValue("@email", emp.email.Trim());
                 cmd.Parameters.AddWithValue("@mobile", emp.mobile.Trim());
                 cmd.Parameters.AddWithValue("@role", emp.role.Trim());
+                cmd.Parameters.AddWithValue("@password", emp.password != null ? emp.password.Trim() : "");
                 cmd.Parameters.AddWithValue("@UpdateBy", "admin");
                 cmd.Parameters.AddWithValue("@UpdateDate", DateTime.Now);
 
@@ -543,6 +547,8 @@ namespace TaskManagement.DataAccessLayer
                         P.updatedate = dtr["UpdateDate"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(dtr["UpdateDate"]);
                         P.progresspercentage = dtr["ProgressPercentage"].ToString();
                         P.remarks = dtr["Remarks"].ToString();
+                        P.empid = Convert.ToInt32(dtr["EmpId"]);
+                        P.taskid = Convert.ToInt32(dtr["TaskId"]);
                         progresses.Add(P);
                     }
 
@@ -857,6 +863,39 @@ namespace TaskManagement.DataAccessLayer
             }
         }
 
+                public EmployeeDetails LoginEmployee(string email, string password)
+        {
+            try
+            {
+                connection();
+                SqlCommand cmd = new SqlCommand("sp_loginEmployee", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@email", email.Trim());
+                cmd.Parameters.AddWithValue("@password", password.Trim());
+                SqlDataAdapter adp = new SqlDataAdapter();
+                adp.SelectCommand = cmd;
+                DataTable dt = new DataTable();
+                adp.Fill(dt);
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow dtr = dt.Rows[0];
+                    EmployeeDetails E = new EmployeeDetails();
+                    E.empid = Convert.ToInt32(dtr["EmpId"]);
+                    E.empname = dtr["EmpName"].ToString();
+                    E.email = dtr["Email"].ToString();
+                    E.mobile = dtr["Mobile"].ToString();
+                    E.role = dtr["Role"].ToString();
+                    return E;
+                }
+                return null;
+            }
+            catch (Exception) { return null; }
+            finally
+            {
+                if (con != null && con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
         public bool SaveEmployeePdf(EmployeePdfDetails pdf)
         {
             try
@@ -941,5 +980,8 @@ namespace TaskManagement.DataAccessLayer
         }
     }
 }
+
+
+
 
 

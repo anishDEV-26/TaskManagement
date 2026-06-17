@@ -1,4 +1,4 @@
-﻿$(document).ready(function () {
+$(document).ready(function () {
     LoadEmployees();
     ProgressList();
 
@@ -181,7 +181,7 @@ function ProgressList() {
                         '<td class="text-center" style="color:#64748b;">' + formatDate(progress.updatedate) + '</td>' +
                         '<td class="text-center" style="color:#64748b;">' + formatDate(progress.duedate) + '</td>' +
                         '<td class="text-center"><div class="progress-wrap"><div class="progress-bar-outer"><div class="progress-bar-inner ' + barClass + '"></div></div><span class="progress-label">' + pct + '</span></div></td>' +
-                        '<td class="text-center" style="color:#64748b;font-size:12.5px;">' + progress.remarks + '</td>' +
+                        '<td class="text-center" style="color:#64748b;font-size:12.5px;max-width:200px !important;width:200px !important;word-break:break-all !important;overflow-wrap:anywhere !important;white-space:normal !important;line-height:1.4;display:block;">' + (progress.remarks || '-') + '</td>' +
                         '<td class="text-center">' +
                         '<div class="action-btn-wrap">' +
                         '<button type="button" class="btn btn-danger btn-sm" onclick="DeleteProgress(' + progress.progressid + ')">' +
@@ -197,7 +197,7 @@ function ProgressList() {
                 });
 
                 if (!$.fn.DataTable.isDataTable('#progressTable')) {
-                    $('#progressTable').DataTable();
+                    $('#progressTable').DataTable({ columnDefs: [{ targets: 6, width: '200px' }], autoWidth: false });
                 }
             } else {
                 showToast("No Data Available", 'info');
@@ -230,3 +230,9 @@ function ConfirmDeleteProgress() {
         error: function (xhr, status, error) { alert("Error: " + error); }
     });
 }
+
+
+
+
+
+

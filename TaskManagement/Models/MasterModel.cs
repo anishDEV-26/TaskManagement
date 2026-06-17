@@ -26,6 +26,7 @@ namespace TaskManagement.Models
         public string email { get; set; }
         public string mobile { get; set; }
         public string role { get; set; }
+        public string password { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public string UpdatedBy { get; set; }
@@ -99,3 +100,4 @@ namespace TaskManagement.Models
         public DateTime addedon { get; set; }
     }
 }
+

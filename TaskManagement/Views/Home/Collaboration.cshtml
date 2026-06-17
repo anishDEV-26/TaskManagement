@@ -566,7 +566,7 @@
         $.ajax({
             type: "GET", url: "/Home/GetCollaborationData", dataType: "json",
             success: function (data) { collabData = data; },
-            error: function () { collabData = { Employees: [], Tasks: [], Assignments: [] }; }
+            error: function () { collabData = { Employees: [], Tasks: [], Assignments: [], Progress: [] }; }
         });
     }
 
@@ -753,57 +753,236 @@
     }
 
     function SuggestEmployee(keyword, originalText) {
-        if (collabData.Employees.length === 0) { AddMessage('No employees found. Please add employees first.', false); return; }
 
-        var keywords = keyword.toLowerCase().split(' ').filter(function (k) { return k.length > 2; });
-
-        var scored = collabData.Employees.map(function (emp) {
-            var score = 0;
-            var role = emp.role.toLowerCase();
-            keywords.forEach(function (kw) {
-                if (role.includes(kw)) score += 10;
-                if (emp.empname.toLowerCase().includes(kw)) score += 5;
-                if ((kw.includes('dev') || kw.includes('code') || kw.includes('web') || kw.includes('frontend') || kw.includes('backend') || kw.includes('full')) && (role.includes('dev') || role.includes('engineer') || role.includes('programmer'))) score += 8;
-                if ((kw.includes('test') || kw.includes('qa')) && (role.includes('test') || role.includes('qa'))) score += 8;
-                if ((kw.includes('design') || kw.includes('ui') || kw.includes('ux')) && role.includes('design')) score += 8;
-                if ((kw.includes('data') || kw.includes('analyt')) && (role.includes('analyt') || role.includes('data'))) score += 8;
-                if ((kw.includes('manage') || kw.includes('lead')) && (role.includes('manage') || role.includes('lead'))) score += 8;
-            });
-            var assignCount = collabData.Assignments.filter(function (a) { return a.empid === emp.empid; }).length;
-            score -= assignCount * 2;
-            return { emp: emp, score: score, assignCount: assignCount };
-        });
-        scored.sort(function (a, b) { return b.score - a.score; });
-        var best = scored[0];
-        var others = scored.slice(1, 3).filter(function (s) { return s.score >= 0; });
-
-        // Find EXACT matching task by name from user input
-        var matchedTask = null;
-        if (collabData.Tasks.length > 0) {
-            var taskKeywords = keyword.toLowerCase().split(' ').filter(function (k) { return k.length > 2; });
-            var taskScored = collabData.Tasks.map(function (task) {
-                var ts = 0;
-                taskKeywords.forEach(function (kw) {
-                    if (task.tasktitle.toLowerCase().includes(kw)) ts += 10;
-                    if (task.description && task.description.toLowerCase().includes(kw)) ts += 3;
-                });
-                return { task: task, score: ts };
-            });
-            taskScored.sort(function (a, b) { return b.score - a.score; });
-            if (taskScored[0].score > 0) matchedTask = taskScored[0].task;
+        if (collabData.Employees.length === 0) {
+            AddMessage('No employees found. Please add employees first.', false);
+            return;
         }
 
-        var othersText = others.length > 0 ? '\n\nOther options: ' + others.map(function (s) { return s.emp.empname + ' (' + s.emp.role + ')'; }).join(', ') : '';
-        var replyText = 'For "' + keyword + '", I suggest ' + best.emp.empname + ' (' + best.emp.role + ') as they have the best matching role.' + othersText;
+        var keywords = keyword.toLowerCase().split(' ').filter(function (k) {
+            return k.length > 2;
+        });
 
-        var confirmHTML = replyText.replace(/\n/g, '<br>');
+        var scored = collabData.Employees.map(function (emp) {
+
+            var score = 0;
+            var role = (emp.role || '').toLowerCase();
+
+            // ROLE MATCH
+            keywords.forEach(function (kw) {
+
+                if (role.includes(kw))
+                    score += 25;
+
+                if (
+                    (kw.includes('dev') ||
+                        kw.includes('code') ||
+                        kw.includes('web') ||
+                        kw.includes('frontend') ||
+                        kw.includes('backend') ||
+                        kw.includes('full'))
+                    &&
+                    (
+                        role.includes('dev') ||
+                        role.includes('engineer') ||
+                        role.includes('programmer')
+                    )
+                )
+                    score += 20;
+
+                if (
+                    (kw.includes('test') || kw.includes('qa'))
+                    &&
+                    (
+                        role.includes('test') ||
+                        role.includes('qa')
+                    )
+                )
+                    score += 20;
+
+                if (
+                    (kw.includes('design') ||
+                        kw.includes('ui') ||
+                        kw.includes('ux'))
+                    &&
+                    role.includes('design')
+                )
+                    score += 20;
+            });
+
+            // CURRENT WORKLOAD
+            var activeAssignments =
+                collabData.Assignments.filter(function (a) {
+                    return a.empid === emp.empid;
+                }).length;
+
+            score -= activeAssignments * 5;
+
+            // COMPLETED TASKS
+            var completedTasks =
+                collabData.Progress.filter(function (p) {
+
+                    return p.empid === emp.empid &&
+                        p.progressstatus &&
+                        p.progressstatus.toLowerCase() === 'completed';
+
+                }).length;
+
+            score += completedTasks * 3;
+
+            // PERFORMANCE %
+            var empProgress =
+                collabData.Progress.filter(function (p) {
+                    return p.empid === emp.empid;
+                });
+
+            if (empProgress.length > 0) {
+
+                var totalPercent = 0;
+
+                empProgress.forEach(function (p) {
+
+                    var val = parseInt(
+                        (p.progresspercentage || '0').replace('%', '')
+                    );
+
+                    totalPercent += isNaN(val) ? 0 : val;
+                });
+
+                var avgPercent =
+                    totalPercent / empProgress.length;
+
+                score += avgPercent / 5;
+            }
+
+            // OVERDUE TASK PENALTY
+            var overdueCount =
+                collabData.Progress.filter(function (p) {
+
+                    if (p.empid !== emp.empid)
+                        return false;
+
+                    if (!p.duedate)
+                        return false;
+
+                    if (
+                        p.progressstatus &&
+                        p.progressstatus.toLowerCase() === 'completed'
+                    )
+                        return false;
+
+                    return new Date(p.duedate) < new Date();
+
+                }).length;
+
+            score -= overdueCount * 10;
+
+            return {
+                emp: emp,
+                score: score,
+                activeAssignments: activeAssignments,
+                completedTasks: completedTasks,
+                overdueCount: overdueCount
+            };
+        });
+
+        scored.sort(function (a, b) {
+            return b.score - a.score;
+        });
+
+        var best = scored[0];
+
+        var matchedTask = null;
+
+        if (collabData.Tasks.length > 0) {
+
+            var taskKeywords =
+                keyword.toLowerCase()
+                    .split(' ')
+                    .filter(function (k) {
+                        return k.length > 2;
+                    });
+
+            var taskScored =
+                collabData.Tasks.map(function (task) {
+
+                    var ts = 0;
+
+                    taskKeywords.forEach(function (kw) {
+
+                        if (
+                            task.tasktitle &&
+                            task.tasktitle.toLowerCase().includes(kw)
+                        )
+                            ts += 10;
+
+                        if (
+                            task.description &&
+                            task.description.toLowerCase().includes(kw)
+                        )
+                            ts += 3;
+                    });
+
+                    return {
+                        task: task,
+                        score: ts
+                    };
+                });
+
+            taskScored.sort(function (a, b) {
+                return b.score - a.score;
+            });
+
+            if (
+                taskScored.length > 0 &&
+                taskScored[0].score > 0
+            )
+                matchedTask = taskScored[0].task;
+
+            if (!matchedTask) {
+
+                AddMessage(
+                    'Task "' + keyword +
+                    '" does not exist. Please create this task first in the Task Creation page and then ask for employee suggestions.',
+                    false
+                );
+
+                return;
+            }
+        }
+
+        var replyText =
+            'For "' + keyword + '" I suggest ' +
+            best.emp.empname +
+            ' (' + best.emp.role + ').\n\n' +
+
+            'Reason:\n' +
+            '• Best role match\n' +
+            '• Active Tasks: ' + best.activeAssignments + '\n' +
+            '• Completed Tasks: ' + best.completedTasks + '\n' +
+            '• Overdue Tasks: ' + best.overdueCount + '\n' +
+            '• Recommendation Score: ' + Math.round(best.score);
+
+        var confirmHTML =
+            replyText.replace(/\n/g, '<br>');
 
         if (matchedTask) {
-            pendingAssign = { empid: best.emp.empid, empname: best.emp.empname, taskid: matchedTask.taskid, tasktitle: matchedTask.tasktitle };
-            confirmHTML += '<br><br>Click below to confirm:<br><button class="collab-confirm-btn" onclick="ConfirmAssignment()"><i class="fa-solid fa-check"></i> Assign ' + best.emp.empname + ' to &quot;' + matchedTask.tasktitle + '&quot;</button>';
-        } else {
-            pendingAssign = null;
-            confirmHTML += '<br><br><div class="collab-error-msg"><i class="fa-solid fa-triangle-exclamation" style="margin-right:6px;"></i>Task <strong>&quot;' + keyword + '&quot;</strong> does not exist in the system. Please create it first in the <a href="/Home/Taskcreation" style="color:#2563eb;font-weight:600;">Tasks page</a>, then come back to assign.</div>';
+
+            pendingAssign = {
+                empid: best.emp.empid,
+                empname: best.emp.empname,
+                taskid: matchedTask.taskid,
+                tasktitle: matchedTask.tasktitle
+            };
+
+            confirmHTML +=
+                '<br><br>' +
+                '<button class="collab-confirm-btn" onclick="ConfirmAssignment()">' +
+                '<i class="fa-solid fa-check"></i> Assign ' +
+                best.emp.empname +
+                ' to "' +
+                matchedTask.tasktitle +
+                '"</button>';
         }
 
         AddMessage(replyText, false, confirmHTML);

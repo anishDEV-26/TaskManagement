@@ -166,8 +166,8 @@
     /* ✅ ADDED: subtask dropdown styles */
     .view-subtask-dropdown {
         position: absolute;
-        top: 100%;
-        right: 0;
+        top: 0;
+        right: 40px;
         background: white;
         border: 1px solid #e2e8f0;
         border-radius: 10px;
@@ -200,11 +200,34 @@
         font-size: 13px;
     }
 
+    #assignTable td,
+    #assignTable tr,
+    #assignTable tbody,
+    #assignTable_wrapper {
+        overflow: visible !important;
+    }
+
+    #assignTable td {
+        position: relative;
+    }
+
+    .view-subtask-dropdown {
+        z-index: 99999 !important;
+    }
+
     @@media(max-width:900px) {
         .assign-form-grid {
             grid-template-columns: 1fr;
         }
     }
+
+    @@media(max-width:900px) {
+        .assign-form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+
 </style>
 
 <div class="assign-main-wrapper">

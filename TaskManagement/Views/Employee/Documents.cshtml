@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "Documents";
+    Layout = "~/Views/Shared/_EmployeeLayout.cshtml";
+}
+<style>
+    .dc-page-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .dc-page-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+
+    .dc-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 18px;
+        background: white;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        max-width: 700px;
+    }
+
+    .dc-icon {
+        width: 44px;
+        height: 44px;
+        background: #fee2e2;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+        .dc-icon i {
+            color: #dc2626;
+            font-size: 18px;
+        }
+
+    .dc-info {
+        flex: 1;
+    }
+
+    .dc-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0f172a;
+        cursor: pointer;
+    }
+
+        .dc-name:hover {
+            color: #0d9488;
+            text-decoration: underline;
+        }
+
+    .dc-meta {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 3px;
+    }
+
+    .dc-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+
+        .dc-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+            color: #cbd5e1;
+        }
+</style>
+<div class="dc-page-title"><i class="fa-solid fa-file-pdf" style="color:#0d9488;"></i> My Documents</div>
+<div class="dc-page-subtitle">Files shared with you by the admin</div>
+<div id="docList"></div>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET", url: "/Employee/GetMyDocuments", dataType: "json",
+            success: function (data) {
+                var container = $('#docList');
+                container.empty();
+                if (!data || data.length === 0) {
+                    container.html('<div class="dc-empty"><i class="fa-solid fa-folder-open"></i>No documents shared yet.</div>');
+                    return;
+                }
+                data.forEach(function (pdf) {
+                    var ts = parseInt(pdf.addedon.replace('/Date(', '').replace(')/', ''));
+                    var dateStr = new Date(ts).toLocaleDateString('en-GB');
+                    container.append('<div class="dc-item"><div class="dc-icon"><i class="fa-solid fa-file-pdf"></i></div><div class="dc-info"><div class="dc-name" onclick="OpenPdf(\'' + pdf.filepath + '\')">' + pdf.filename + '</div><div class="dc-meta">' + pdf.filesize + ' &middot; Added on ' + dateStr + '</div></div></div>');
+                });
+            }
+        });
+    });
+    function OpenPdf(filepath) {
+        window.open('/Employee/ViewPdf?path=' + encodeURIComponent(filepath), '_blank');
+    }
+</script>

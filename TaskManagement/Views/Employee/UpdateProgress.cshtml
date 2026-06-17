@@ -1,0 +1,180 @@
+﻿@{
+    ViewBag.Title = "Update Progress";
+    Layout = "~/Views/Shared/_EmployeeLayout.cshtml";
+}
+<style>
+    .up-page-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .up-page-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+
+    .up-card {
+        background: white;
+        border-radius: 18px;
+        padding: 30px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        border: 1px solid #f1f5f9;
+        max-width: 600px;
+    }
+
+    .up-group {
+        margin-bottom: 20px;
+    }
+
+        .up-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+            .up-group label i {
+                margin-right: 6px;
+                color: #0d9488;
+            }
+
+    .up-input, .up-select, .up-textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 14px;
+        outline: none;
+        transition: 0.2s;
+        font-family: Inter,Arial,sans-serif;
+    }
+
+        .up-input:focus, .up-select:focus, .up-textarea:focus {
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+        }
+
+    .up-btn {
+        padding: 13px 26px;
+        background: linear-gradient(135deg, #0d9488, #0f766e);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .up-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(13,148,136,0.35);
+        }
+
+    .up-success {
+        background: #f0fdf4;
+        color: #166534;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        display: none;
+    }
+
+    .up-error {
+        background: #fef2f2;
+        color: #dc2626;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        margin-bottom: 16px;
+        display: none;
+    }
+
+    .up-history-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 30px 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+<div class="up-page-title"><i class="fa-solid fa-chart-simple" style="color:#0d9488;"></i> Update Task Progress</div>
+<div class="up-page-subtitle">Update your progress on assigned tasks for the admin to see</div>
+<div class="up-card">
+    <div class="up-success" id="upSuccess"></div>
+    <div class="up-error" id="upError"></div>
+    <div class="up-group">
+        <label><i class="fa-solid fa-list-check"></i> Task Name</label>
+        <input type="text" id="inputTaskName" class="up-input" placeholder="Enter the exact task name assigned to you" list="myTaskNames" />
+        <datalist id="myTaskNames"></datalist>
+    </div>
+    <div class="up-group">
+        <label><i class="fa-solid fa-spinner"></i> Progress Status</label>
+        <select id="inputStatus" class="up-select">
+            <option value="">-- Select Status --</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+        </select>
+    </div>
+    <div class="up-group">
+        <label><i class="fa-solid fa-comment"></i> Remarks (optional)</label>
+        <textarea id="inputRemarks" class="up-textarea" rows="3" placeholder="Any notes for the admin..."></textarea>
+    </div>
+    <button class="up-btn" onclick="SubmitProgress()"><i class="fa-solid fa-floppy-disk"></i> Update Progress</button>
+</div>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET", url: "/Employee/GetMyTasks", dataType: "json",
+            success: function (res) {
+                if (res.success && res.GetList) {
+                    var datalist = $('#myTaskNames');
+                    res.GetList.forEach(function (t) {
+                        datalist.append('<option value="' + t.tasktitle + '">');
+                    });
+                }
+            }
+        });
+    });
+    function SubmitProgress() {
+        var taskname = $('#inputTaskName').val().trim();
+        var status = $('#inputStatus').val();
+        var remarks = $('#inputRemarks').val().trim();
+        $('#upError').hide();
+        $('#upSuccess').hide();
+        if (!taskname || !status) {
+            $('#upError').text('Please enter task name and select a status.').show();
+            return;
+        }
+        $.ajax({
+            type: "POST", url: "/Employee/SaveMyProgress",
+            data: { tasktitle: taskname, progressstatus: status, remarks: remarks },
+            dataType: "json",
+            success: function (res) {
+                if (res.success) {
+                    $('#upSuccess').text(res.message).show();
+                    $('#inputTaskName').val('');
+                    $('#inputStatus').val('');
+                    $('#inputRemarks').val('');
+                } else {
+                    $('#upError').text(res.message).show();
+                }
+            },
+            error: function () { $('#upError').text('Something went wrong. Please try again.').show(); }
+        });
+    }
+</script>

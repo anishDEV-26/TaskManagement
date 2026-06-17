@@ -121,6 +121,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="DataAccessLayer\Masterdal.cs" />
     <Compile Include="Global.asax.cs">
@@ -193,10 +194,16 @@
     <Content Include="Views\Home\TaskProgress.cshtml" />
     <Content Include="Views\Home\Reports.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
-    <Content Include="Views\Account\Signup.cshtml" />
     <Content Include="Views\Home\Calendar.cshtml" />
     <Content Include="Views\Home\Voice.cshtml" />
     <Content Include="Views\Home\Collaboration.cshtml" />
+    <Content Include="Views\Shared\_EmployeeLayout.cshtml" />
+    <Content Include="Views\Employee\Index.cshtml" />
+    <Content Include="Views\Employee\UpdateProgress.cshtml" />
+    <Content Include="Views\Employee\Calendar.cshtml" />
+    <Content Include="Views\Employee\Profile.cshtml" />
+    <Content Include="Views\Employee\Notifications.cshtml" />
+    <Content Include="Views\Employee\Documents.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

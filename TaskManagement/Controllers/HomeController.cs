@@ -309,12 +309,14 @@ namespace TaskManagement.Controllers
             var employees = masterdal.getEmployee();
             var tasks = masterdal.getTask();
             var assignments = masterdal.getTaskAssign();
+            var progress = masterdal.getTaskProgress();
 
             return Json(new
             {
-                Employees = employees != null ? employees.GetList : new System.Collections.Generic.List<EmployeeDetails>(),
-                Tasks = tasks != null ? tasks.GetList : new System.Collections.Generic.List<TaskDetails>(),
-                Assignments = assignments != null ? assignments.GetList : new System.Collections.Generic.List<TaskAssignDetails>()
+                Employees = employees != null ? employees.GetList : new List<EmployeeDetails>(),
+                Tasks = tasks != null ? tasks.GetList : new List<TaskDetails>(),
+                Assignments = assignments != null ? assignments.GetList : new List<TaskAssignDetails>(),
+                Progress = progress != null ? progress.GetList : new List<TaskProgressDetails>()
             }, JsonRequestBehavior.AllowGet);
         }
 

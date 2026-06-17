@@ -351,7 +351,7 @@
             <div class="login-subtitle">Please sign in to your account</div>
             <div class="login-error" id="loginError"></div>
             <div class="login-group">
-                <label><i class="fa-solid fa-user" style="margin-right:6px;color:#2563eb;"></i> Username or Email</label>
+                <label id="usernameLabel"><i class="fa-solid fa-user" style="margin-right:6px;color:#2563eb;"></i> Username or Email</label>
                 <div class="login-input-wrap">
                     <i class="fa-solid fa-user"></i>
                     <input type="text" id="inputUsernameEmail" class="login-input" placeholder="Enter username or email" />
@@ -381,9 +381,6 @@
             <button class="login-btn" onclick="Login()">
                 <i class="fa-solid fa-right-to-bracket" style="margin-right:8px;"></i> Sign In
             </button>
-            <div class="login-signup" id="signupLink">
-                Do not have an account? <a href="/Account/Signup">Sign Up</a>
-            </div>
         </div>
     </div>
     <div class="fp-overlay" id="fpOverlay">
@@ -420,10 +417,12 @@
             var role = $("#inputRole").val();
             if (role === "Employee") {
                 $("#forgotPasswordLink").hide();
-                $("#signupLink").hide();
+                $("#usernameLabel").html('<i class="fa-solid fa-envelope" style="margin-right:6px;color:#2563eb;"></i> Email Address');
+                $("#inputUsernameEmail").attr("placeholder", "Enter your email");
             } else {
                 $("#forgotPasswordLink").show();
-                $("#signupLink").show();
+                $("#usernameLabel").html('<i class="fa-solid fa-user" style="margin-right:6px;color:#2563eb;"></i> Username or Email');
+                $("#inputUsernameEmail").attr("placeholder", "Enter username or email");
             }
         }
         function Login() {
@@ -441,7 +440,7 @@
                 dataType: "json",
                 success: function (response) {
                     if (response.success) {
-                        window.location.href = "/Home/Index";
+                        window.location.href = response.redirect || "/Home/Index";
                     } else {
                         $("#loginError").text(response.message).show();
                     }
@@ -497,3 +496,7 @@
     </script>
 </body>
 </html>
+
+
+
+

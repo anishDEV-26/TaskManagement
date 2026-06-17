@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewBag.Title = "Employees";
 }
 
@@ -294,6 +294,13 @@
                             <label><i class="fa-solid fa-briefcase"></i> Role</label>
                             <input type="text" id="inputRole" placeholder="Enter Role" />
                         </div>
+                        <div class="emp-input-group">
+                            <label><i class="fa-solid fa-lock"></i> Password</label>
+                            <div style="position:relative;">
+                                <input type="password" id="inputEmpPassword" placeholder="Enter Login Password" style="width:100%;padding-right:42px;" />
+                                <i class="fa-solid fa-eye" onclick="ToggleInputPassword('inputEmpPassword', this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:#94a3b8;"></i>
+                            </div>
+                        </div>
                     </div>
                     <div class="emp-btn-container">
                         <button class="emp-btn emp-save-btn" onclick="SaveEmployee()">
@@ -333,6 +340,13 @@
                         <div class="emp-input-group">
                             <label><i class="fa-solid fa-briefcase"></i> Role</label>
                             <input type="text" id="editRole" />
+                        </div>
+                        <div class="emp-input-group">
+                            <label><i class="fa-solid fa-lock"></i> Password <small style="color:#94a3b8;font-weight:400;">(leave blank to keep current)</small></label>
+                            <div style="position:relative;">
+                                <input type="password" id="editEmpPassword" placeholder="Enter new password" style="width:100%;padding-right:42px;" />
+                                <i class="fa-solid fa-eye" onclick="ToggleInputPassword('editEmpPassword', this)" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:#94a3b8;"></i>
+                            </div>
                         </div>
                     </div>
                     <div class="emp-btn-container">
@@ -374,7 +388,7 @@
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="fa-solid fa-file-pdf" style="color:#dc2626;margin-right:8px;"></i>
-                    Imported Files — <span id="pdfModalEmpName"></span>
+                    Imported Files � <span id="pdfModalEmpName"></span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -398,10 +412,14 @@
             <th class="text-center">Email Address</th>
             <th class="text-center">Mobile Number</th>
             <th class="text-center">Role</th>
+            <th class="text-center">Password</th>
             <th class="text-center">Action</th>
         </tr>
     </thead>
     <tbody id="employeeTableBody"></tbody>
 </table>
 
-<script src="/javascript/employee.js?v=2"></script>
+<script src="/javascript/employee.js?v=100"></script>
+
+
+

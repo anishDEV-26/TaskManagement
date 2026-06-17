@@ -1,9 +1,7 @@
 ﻿let currentEmpId = null;
-
 $(document).ready(function () {
     EmployeeList();
 });
-
 function showToast(message, type) {
     const toastContainer = document.querySelector('.toast-container');
     const toastEl = document.createElement('div');
@@ -20,13 +18,13 @@ function showToast(message, type) {
     toastContainer.appendChild(toastEl);
     setTimeout(() => toastEl.remove(), 3000);
 }
-
 function SaveEmployee() {
     let EmpDetails = {
         empname: $("#inputEmpName").val(),
         email: $("#inputEmail").val(),
         mobile: $("#inputMobile").val(),
-        role: $("#inputRole").val()
+        role: $("#inputRole").val(),
+        password: $("#inputEmpPassword").val()
     };
     $.ajax({
         type: "POST",
@@ -43,7 +41,6 @@ function SaveEmployee() {
         error: function (xhr, status, error) { alert("Error: " + error); }
     });
 }
-
 function EmployeeList() {
     $.ajax({
         type: "GET",
@@ -58,13 +55,11 @@ function EmployeeList() {
                 var empList = data.GetList;
                 var loadedCount = 0;
                 var rowsData = [];
-
                 // First build all rows without pdf count
                 empList.forEach(function (emp) {
                     rowsData.push({ emp: emp, counter: counter });
                     counter++;
                 });
-
                 // Render rows first
                 rowsData.forEach(function (item) {
                     var emp = item.emp;
@@ -74,6 +69,11 @@ function EmployeeList() {
                         '<td class="text-center">' + emp.email + '</td>' +
                         '<td class="text-center">' + emp.mobile + '</td>' +
                         '<td class="text-center">' + emp.role + '</td>' +
+                        '<td class="text-center">' +
+                        '<span class="pwd-mask" id="pwdMask_' + emp.empid + '">\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022</span>' +
+                        '<span class="pwd-real" id="pwdReal_' + emp.empid + '" style="display:none;">' + (emp.password || '(not set)') + '</span> ' +
+                        '<i class="fa-solid fa-eye" style="cursor:pointer;color:#64748b;margin-left:6px;" onclick="ShowPassword(' + emp.empid + ')" title="View password"></i>' +
+                        '</td>' +
                         '<td class="text-center">' +
                         '<button type="button" class="btn btn-info btn-sm me-1" onclick="EditEmployee(' + emp.empid + ')" title="Edit">' +
                         '<i class="fa-solid fa-pen-to-square"></i>' +
@@ -92,12 +92,10 @@ function EmployeeList() {
                         '</tr>';
                     $("#employeeTableBody").append(row);
                 });
-
                 // Initialize DataTable
                 if (!$.fn.DataTable.isDataTable('#employeeTable')) {
                     $('#employeeTable').DataTable();
                 }
-
                 // Load PDF count for each employee
                 rowsData.forEach(function (item) {
                     $.ajax({
@@ -115,7 +113,6 @@ function EmployeeList() {
                         }
                     });
                 });
-
             } else {
                 showToast("No Data Available", 'info');
             }
@@ -123,7 +120,6 @@ function EmployeeList() {
         error: function (xhr, status, error) { alert("Error: " + error); }
     });
 }
-
 function EditEmployee(empid) {
     $.ajax({
         type: "GET",
@@ -136,20 +132,21 @@ function EditEmployee(empid) {
                 $("#editEmail").val(data.email);
                 $("#editMobile").val(data.mobile);
                 $("#editRole").val(data.role);
+                $("#editEmpPassword").val("");
                 $('#editEmployeeModal').modal('show');
             }
         },
         error: function (xhr, status, error) { alert("Error: " + error); }
     });
 }
-
 function UpdateEmployee() {
     let EmpDetails = {
         empid: $("#editEmpId").val(),
         empname: $("#editEmpName").val(),
         email: $("#editEmail").val(),
         mobile: $("#editMobile").val(),
-        role: $("#editRole").val()
+        role: $("#editRole").val(),
+        password: $("#editEmpPassword").val()
     };
     $.ajax({
         type: "POST",
@@ -167,12 +164,10 @@ function UpdateEmployee() {
         error: function (xhr, status, error) { alert("Error: " + error); }
     });
 }
-
 function DeleteEmployee(empid) {
     $("#deleteEmpId").val(empid);
     $('#deleteEmployeeModal').modal('show');
 }
-
 function ConfirmDeleteEmployee() {
     let empid = $("#deleteEmpId").val();
     $.ajax({
@@ -191,43 +186,33 @@ function ConfirmDeleteEmployee() {
         error: function (xhr, status, error) { alert("Error: " + error); }
     });
 }
-
 // PDF FUNCTIONS
 function ImportPdf(empid) {
     currentEmpId = empid;
     $("#hiddenFileInput").val('');
     $("#hiddenFileInput").click();
 }
-
 function UploadPdf() {
     var files = $("#hiddenFileInput")[0].files;
     if (!files || files.length === 0) return;
-
     var invalidFiles = [];
     for (var i = 0; i < files.length; i++) {
         if (!files[i].name.toLowerCase().endsWith('.pdf')) {
             invalidFiles.push(files[i].name);
         }
     }
-
     if (invalidFiles.length > 0) {
         alert('Only PDF files are allowed. Invalid files: ' + invalidFiles.join(', '));
         return;
     }
-
     var totalFiles = files.length;
     var uploadCount = 0;
     var successCount = 0;
-
     showToast('Uploading ' + totalFiles + ' file(s)...', 'info');
-
-    // Convert FileList to array first
     var fileArray = Array.from(files);
-
     fileArray.forEach(function (file) {
         var formData = new FormData();
         formData.append('file', file);
-
         $.ajax({
             type: "POST",
             url: "/Home/UploadEmployeePdf?empid=" + currentEmpId,
@@ -262,17 +247,14 @@ function ViewPdfs(empid, empname) {
     LoadPdfList(empid);
     $('#pdfListModal').modal('show');
 }
-
 function LoadPdfList(empid) {
     $("#pdfListContainer").html('<div class="text-center p-4"><i class="fa-solid fa-spinner fa-spin fa-2x" style="color:#2563eb;"></i><br><br>Loading files...</div>');
-
     $.ajax({
         type: "GET",
         url: "/Home/GetEmployeePdfs?empid=" + empid,
         dataType: "json",
         success: function (data) {
             $("#pdfListContainer").empty();
-
             if (data != null && data.length > 0) {
                 data.forEach(function (pdf) {
                     let addedOn = new Date(parseInt(pdf.addedon.replace('/Date(', '').replace(')/', ''))).toLocaleDateString('en-GB');
@@ -283,7 +265,7 @@ function LoadPdfList(empid) {
                             </div>
                             <div class="pdf-info">
                                 <div class="pdf-name" onclick="OpenPdf('${pdf.filepath}')">${pdf.filename}</div>
-                                <div class="pdf-meta">${pdf.filesize} &nbsp;·&nbsp; Added on ${addedOn}</div>
+                                <div class="pdf-meta">${pdf.filesize} &nbsp;&middot;&nbsp; Added on ${addedOn}</div>
                             </div>
                             <button class="pdf-delete-btn" onclick="DeletePdf(${pdf.pdfid})" title="Delete">
                                 <i class="fa-solid fa-trash"></i>
@@ -306,14 +288,11 @@ function LoadPdfList(empid) {
         }
     });
 }
-
 function OpenPdf(filepath) {
     window.open('/Home/ViewPdf?path=' + encodeURIComponent(filepath), '_blank');
 }
-
 function DeletePdf(pdfid) {
     if (!confirm('Are you sure you want to delete this file?')) return;
-
     $.ajax({
         type: "POST",
         url: "/Home/DeleteEmployeePdf?pdfid=" + pdfid,
@@ -336,4 +315,27 @@ function DeletePdf(pdfid) {
         },
         error: function () { alert("Error deleting file."); }
     });
+}
+function ToggleInputPassword(inputId, iconEl) {
+    var input = document.getElementById(inputId);
+    if (input.type === "password") {
+        input.type = "text";
+        iconEl.classList.remove("fa-eye");
+        iconEl.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        iconEl.classList.remove("fa-eye-slash");
+        iconEl.classList.add("fa-eye");
+    }
+}
+function ShowPassword(empid) {
+    var mask = document.getElementById('pwdMask_' + empid);
+    var real = document.getElementById('pwdReal_' + empid);
+    if (!mask || !real) return;
+    mask.style.display = 'none';
+    real.style.display = 'inline';
+    setTimeout(function () {
+        mask.style.display = 'inline';
+        real.style.display = 'none';
+    }, 3000);
 }

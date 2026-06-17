@@ -1,0 +1,147 @@
+﻿@{
+    ViewBag.Title = "My Profile";
+    Layout = "~/Views/Shared/_EmployeeLayout.cshtml";
+}
+<style>
+    .pf-page-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .pf-page-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+
+    .pf-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        border: 1px solid #f1f5f9;
+        max-width: 600px;
+    }
+
+    .pf-avatar {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d9488, #0e7490);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 36px;
+        font-weight: 700;
+        margin: 0 auto 24px;
+    }
+
+    .pf-name {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .pf-role-badge {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+        .pf-role-badge span {
+            background: #f0fdfa;
+            color: #0f766e;
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+    .pf-field {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+        .pf-field:last-child {
+            border-bottom: none;
+        }
+
+    .pf-field-icon {
+        width: 42px;
+        height: 42px;
+        background: #f0fdfa;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0d9488;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .pf-field-label {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .pf-field-value {
+        font-size: 15px;
+        color: #0f172a;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+</style>
+<div class="pf-page-title"><i class="fa-solid fa-user" style="color:#0d9488;"></i> My Profile</div>
+<div class="pf-page-subtitle">Your personal account information</div>
+<div class="pf-card" id="profileCard">
+    <div class="pf-avatar" id="pfAvatar">-</div>
+    <div class="pf-name" id="pfName">Loading...</div>
+    <div class="pf-role-badge"><span id="pfRoleBadge">-</span></div>
+    <div class="pf-field">
+        <div class="pf-field-icon"><i class="fa-solid fa-user"></i></div>
+        <div><div class="pf-field-label">Full Name</div><div class="pf-field-value" id="pfFullName">-</div></div>
+    </div>
+    <div class="pf-field">
+        <div class="pf-field-icon"><i class="fa-solid fa-envelope"></i></div>
+        <div><div class="pf-field-label">Email Address</div><div class="pf-field-value" id="pfEmail">-</div></div>
+    </div>
+    <div class="pf-field">
+        <div class="pf-field-icon"><i class="fa-solid fa-phone"></i></div>
+        <div><div class="pf-field-label">Mobile Number</div><div class="pf-field-value" id="pfMobile">-</div></div>
+    </div>
+    <div class="pf-field">
+        <div class="pf-field-icon"><i class="fa-solid fa-briefcase"></i></div>
+        <div><div class="pf-field-label">Role</div><div class="pf-field-value" id="pfRole">-</div></div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET", url: "/Employee/GetMyProfile", dataType: "json",
+            success: function (data) {
+                if (data) {
+                    $('#pfAvatar').text(data.empname.charAt(0).toUpperCase());
+                    $('#pfName').text(data.empname);
+                    $('#pfRoleBadge').text(data.role);
+                    $('#pfFullName').text(data.empname);
+                    $('#pfEmail').text(data.email);
+                    $('#pfMobile').text(data.mobile);
+                    $('#pfRole').text(data.role);
+                }
+            }
+        });
+    });
+</script>
