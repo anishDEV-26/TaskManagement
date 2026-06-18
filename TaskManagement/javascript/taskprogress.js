@@ -1,51 +1,5 @@
 $(document).ready(function () {
-    LoadEmployees();
     ProgressList();
-
-    $("#tprogEmployee").change(function () {
-        let empid = $(this).val();
-        if (empid != "") {
-            LoadTasks(empid);
-        } else {
-            $("#tprogTask").empty().append('<option value="">Choose Task</option>');
-            $("#tprogDueDate").val("");
-        }
-    });
-
-    $("#tprogTask").change(function () {
-        let taskid = $(this).val();
-        if (taskid != "") {
-            $.ajax({
-                type: "GET",
-                url: "/Home/GetTaskById?taskid=" + taskid,
-                dataType: "json",
-                success: function (data) {
-                    if (data != null && data.duedate) {
-                        let dueDate = new Date(parseInt(data.duedate.replace('/Date(', '').replace(')/', '')));
-                        let formatted = dueDate.toISOString().split('T')[0];
-                        $("#tprogDueDate").val(formatted);
-                    } else {
-                        $("#tprogDueDate").val("");
-                    }
-                }
-            });
-        } else {
-            $("#tprogDueDate").val("");
-        }
-    });
-
-    $("#tprogStatus").change(function () {
-        let status = $(this).val();
-        if (status == "Pending") {
-            $("#tprogPercentage").val("0%").prop("disabled", true);
-        } else if (status == "In Progress") {
-            $("#tprogPercentage").val("50%").prop("disabled", true);
-        } else if (status == "Completed") {
-            $("#tprogPercentage").val("100%").prop("disabled", true);
-        } else {
-            $("#tprogPercentage").val("").prop("disabled", false);
-        }
-    });
 });
 
 function showToast(message, type) {
@@ -62,71 +16,6 @@ function showToast(message, type) {
         '</div>';
     toastContainer.appendChild(toastEl);
     setTimeout(function () { toastEl.remove(); }, 3000);
-}
-
-function LoadEmployees() {
-    $.ajax({
-        type: "GET",
-        url: "/Home/GetEmployeeList",
-        dataType: "json",
-        success: function (data) {
-            if (data != null && data.GetList != null) {
-                data.GetList.forEach(function (emp) {
-                    $("#tprogEmployee").append(
-                        '<option value="' + emp.empid + '">' + emp.empname + '</option>'
-                    );
-                });
-            }
-        }
-    });
-}
-
-function LoadTasks(empid) {
-    $("#tprogTask").empty().append('<option value="">Choose Task</option>');
-    $("#tprogDueDate").val("");
-
-    $.ajax({
-        type: "GET",
-        url: "/Home/GetTaskAssignList",
-        dataType: "json",
-        success: function (data) {
-            if (data != null && data.GetList != null) {
-                data.GetList.forEach(function (assign) {
-                    if (assign.empid == empid) {
-                        $("#tprogTask").append(
-                            '<option value="' + assign.taskid + '">' + assign.tasktitle + '</option>'
-                        );
-                    }
-                });
-            }
-        }
-    });
-}
-
-function SaveTaskProgress() {
-    var ProgressDetails = {
-        empid: $("#tprogEmployee").val(),
-        taskid: $("#tprogTask").val(),
-        progressstatus: $("#tprogStatus").val(),
-        updatedate: $("#tprogDate").val(),
-        progresspercentage: $("#tprogPercentage").val(),
-        remarks: $("#tprogRemarks").val()
-    };
-
-    $.ajax({
-        type: "POST",
-        url: "/Home/SaveTaskProgress",
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(ProgressDetails),
-        dataType: "json",
-        success: function (response) {
-            var message = response.success ? "Success: " + response.message : "Error: " + response.message;
-            var type = response.success ? 'success' : 'danger';
-            showToast(message, type);
-            setTimeout(function () { window.location.reload(true); }, 3000);
-        },
-        error: function (xhr, status, error) { alert("Error: " + error); }
-    });
 }
 
 function ProgressList() {
@@ -152,9 +41,7 @@ function ProgressList() {
                     var whatsappBtn = '';
                     if (progress.progressstatus == 'Pending' && progress.mobile) {
                         var mobile = progress.mobile.replace(/\D/g, '');
-                        if (mobile.length == 10) {
-                            mobile = '91' + mobile;
-                        }
+                        if (mobile.length == 10) { mobile = '91' + mobile; }
                         var dueText = progress.duedate ? formatDate(progress.duedate) : 'N/A';
                         var waMessage = encodeURIComponent(
                             'Dear ' + progress.empname + ', your task "' + progress.tasktitle +
@@ -177,11 +64,11 @@ function ProgressList() {
                         '<td class="text-center">' + counter + '</td>' +
                         '<td class="text-center" style="font-weight:600;color:#0f172a;">' + progress.empname + '</td>' +
                         '<td class="text-center" style="font-weight:500;">' + progress.tasktitle + '</td>' +
-                        '<td class="text-center"><span class="status-badge ' + statusClass + '"><i class="fa-solid ' + statusIcon + '"></i>' + progress.progressstatus + '</span></td>' +
+                        '<td class="text-center"><span class="status-badge ' + statusClass + '"><i class="fa-solid ' + statusIcon + '"></i> ' + progress.progressstatus + '</span></td>' +
                         '<td class="text-center" style="color:#64748b;">' + formatDate(progress.updatedate) + '</td>' +
                         '<td class="text-center" style="color:#64748b;">' + formatDate(progress.duedate) + '</td>' +
                         '<td class="text-center"><div class="progress-wrap"><div class="progress-bar-outer"><div class="progress-bar-inner ' + barClass + '"></div></div><span class="progress-label">' + pct + '</span></div></td>' +
-                        '<td class="text-center" style="color:#64748b;font-size:12.5px;max-width:200px !important;width:200px !important;word-break:break-all !important;overflow-wrap:anywhere !important;white-space:normal !important;line-height:1.4;display:block;">' + (progress.remarks || '-') + '</td>' +
+                        '<td class="text-center" style="color:#64748b;font-size:12.5px;max-width:200px;word-break:break-all;white-space:normal;line-height:1.4;">' + (progress.remarks || '-') + '</td>' +
                         '<td class="text-center">' +
                         '<div class="action-btn-wrap">' +
                         '<button type="button" class="btn btn-danger btn-sm" onclick="DeleteProgress(' + progress.progressid + ')">' +
@@ -197,7 +84,10 @@ function ProgressList() {
                 });
 
                 if (!$.fn.DataTable.isDataTable('#progressTable')) {
-                    $('#progressTable').DataTable({ columnDefs: [{ targets: 6, width: '200px' }], autoWidth: false });
+                    $('#progressTable').DataTable({
+                        columnDefs: [{ targets: 6, width: '200px' }],
+                        autoWidth: false
+                    });
                 }
             } else {
                 showToast("No Data Available", 'info');
@@ -230,9 +120,3 @@ function ConfirmDeleteProgress() {
         error: function (xhr, status, error) { alert("Error: " + error); }
     });
 }
-
-
-
-
-
-
